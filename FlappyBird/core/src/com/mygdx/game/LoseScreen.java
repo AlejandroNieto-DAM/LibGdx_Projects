@@ -28,6 +28,7 @@ public class LoseScreen implements Screen {
                 if(highscore > this.highscore){
                     this.highscore = highscore;
                 }
+                
 	}
 
 	@Override
@@ -45,11 +46,15 @@ public class LoseScreen implements Screen {
                 game.font.draw(game.batch, "The highscore now is:  " + this.highscore, 100, 150);
 		game.font.draw(game.batch, "Tap anywhere to begin again!!", 100, 100);
 		game.batch.end();
-
+                
+                
+                
 		if (Gdx.input.isTouched()) {
 			game.setScreen(new GameScreen(game, highscore));
 			dispose();
 		}
+                
+                
 	}
 
 	@Override
@@ -75,4 +80,6 @@ public class LoseScreen implements Screen {
 	@Override
 	public void dispose() {
 	}
+        
+        
 }

@@ -10,11 +10,21 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.StreamCorruptedException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MainMenuScreen implements Screen {
         final MyGdxGame game;
 	OrthographicCamera camera;
         Texture bg;
+        int highscore;
 
 	public MainMenuScreen(final MyGdxGame gam) {
 		game = gam;
@@ -23,12 +33,40 @@ public class MainMenuScreen implements Screen {
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);
+                this.highscore = 0;
 
 	}
+        
+        public void readHighScore() throws FileNotFoundException, IOException, ClassNotFoundException{
+            File fichero = new File("HighScore.dat");
+
+            if(fichero.length() > 0){
+
+                ObjectInputStream dataIs = new ObjectInputStream(new FileInputStream(fichero));
+
+                int score = (int) dataIs.readInt(); 
+                
+                dataIs.close();
+                
+                this.highscore = score;
+                
+            }
+            
+            
+            
+           
+        }
 
 	@Override
 	public void render(float delta) {
 		
+            try {
+                this.readHighScore();
+            } catch (IOException ex) {
+                Logger.getLogger(MainMenuScreen.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(MainMenuScreen.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
@@ -41,10 +79,12 @@ public class MainMenuScreen implements Screen {
 		game.batch.end();
 
 		if (Gdx.input.isTouched()) {
-			game.setScreen(new GameScreen(game, 0));
+			game.setScreen(new GameScreen(game, this.highscore));
 			dispose();
 		}
 	}
+        
+         
 
 	@Override
 	public void resize(int width, int height) {
@@ -69,4 +109,7 @@ public class MainMenuScreen implements Screen {
 	@Override
 	public void dispose() {
 	}
+        
+
+           
 }

@@ -22,6 +22,13 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GameScreen implements Screen {
   	final MyGdxGame game;
@@ -59,8 +66,8 @@ public class GameScreen implements Screen {
                 
                 this.highscore = highscore;
 		// load the images for the droplet and the bucket, 64x64 pixels each
-		dropImage = new Texture(Gdx.files.internal("tuberiaBuena.png"));
-                dropImage2 = new Texture(Gdx.files.internal("tuberiaBuena2.png"));
+		dropImage = new Texture(Gdx.files.internal("tuberiaHieloAbajo.png"));
+                dropImage2 = new Texture(Gdx.files.internal("tuberiaHieloArriba.png"));
                 
 		bucketImage = new Texture(Gdx.files.internal("supermanJump.png"));
                 down = new Texture(Gdx.files.internal("supermanDown.png"));
@@ -82,8 +89,8 @@ public class GameScreen implements Screen {
 		bucket.x = 40; // center the bucket horizontally
 		bucket.y = 480 / 2 - 64 / 2; // bottom left corner of the bucket is 20 pixels above
 						// the bottom screen edge
-		bucket.width = 64;
-		bucket.height = 64;
+		bucket.width = 50;
+		bucket.height = 50;
                 
 		// create the raindrops array and spawn the first raindrop
 		raindrops = new Array<Rectangle>();
@@ -141,7 +148,7 @@ public class GameScreen implements Screen {
 		}
                 
                 for (Rectangle raindrop : raindrops2) {
-			game.batch.draw(dropImage2, raindrop.x, raindrop.y);
+			game.batch.draw(dropImage2, raindrop.x + 64, raindrop.y, -raindrop.width, raindrop.height);
 		}
                 
 		game.batch.end();
@@ -160,6 +167,11 @@ public class GameScreen implements Screen {
 			bucket.y = 0;
                         if(dropsGathered > highscore){
                             highscore = dropsGathered;
+                            try {
+                                this.saveHighScore();
+                            } catch (IOException ex) {
+                                Logger.getLogger(GameScreen.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
                         game.setScreen(new LoseScreen(game, dropsGathered, highscore));
                         dispose();
@@ -205,7 +217,14 @@ public class GameScreen implements Screen {
 			Rectangle raindrop = iter.next();
                         
                        
-                        raindrop.x -= 500 * Gdx.graphics.getDeltaTime(); 
+                        if(dropsGathered > 5 && dropsGathered <= 10){
+                           raindrop.x -= 600 * Gdx.graphics.getDeltaTime();
+                        } else if(dropsGathered > 10){
+                            raindrop.x -= 700 * Gdx.graphics.getDeltaTime(); 
+                        } else {
+                            raindrop.x -= 500 * Gdx.graphics.getDeltaTime(); 
+                        }
+                        
                         
 			if (raindrop.x + 64 < 0){
                             iter.remove();
@@ -218,6 +237,11 @@ public class GameScreen implements Screen {
                             
                             if(dropsGathered > highscore){
                                 highscore = dropsGathered;
+                                try {
+                                    this.saveHighScore();
+                                } catch (IOException ex) {
+                                    Logger.getLogger(GameScreen.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                             }
                             game.setScreen(new LoseScreen(game, dropsGathered, highscore));
                             dispose();
@@ -233,11 +257,17 @@ public class GameScreen implements Screen {
 			Rectangle raindrop = iter2.next();
                         
                        
-                        raindrop.x -= 500 * Gdx.graphics.getDeltaTime(); 
                         
-			
-			
-				
+                        if(dropsGathered > 5 && dropsGathered <= 10){
+                           raindrop.x -= 600 * Gdx.graphics.getDeltaTime();
+                        } else if(dropsGathered > 10){
+                            raindrop.x -= 700 * Gdx.graphics.getDeltaTime(); 
+                        } else {
+                            raindrop.x -= 500 * Gdx.graphics.getDeltaTime(); 
+                        }
+                        
+
+                        
 			if (raindrop.overlaps(bucket)) {
                             if(dropsGathered > highscore){
                                 highscore = dropsGathered;
@@ -250,6 +280,21 @@ public class GameScreen implements Screen {
                         
 		}
 	}
+        
+        public void saveHighScore() throws FileNotFoundException, IOException{
+            File ficheroBorrar = new File("HighScore.dat");
+            ficheroBorrar.delete();
+            File fichero = new File("HighScore.dat");
+            FileOutputStream fileout = new FileOutputStream(fichero,true);  
+            ObjectOutputStream dataOS = new ObjectOutputStream(fileout);  
+
+
+            dataOS.writeInt(this.highscore);
+             
+
+            dataOS.close();  //cerrar stream de salida   
+        
+        }
 
 	@Override
 	public void resize(int width, int height) {
