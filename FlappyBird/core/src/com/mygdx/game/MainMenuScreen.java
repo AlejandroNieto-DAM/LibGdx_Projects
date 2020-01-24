@@ -7,16 +7,13 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.StreamCorruptedException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,10 +47,7 @@ public class MainMenuScreen implements Screen {
                 
                 this.highscore = score;
                 
-            }
-            
-            
-            
+            }     
            
         }
 

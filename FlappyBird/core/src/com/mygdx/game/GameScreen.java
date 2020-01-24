@@ -33,23 +33,26 @@ import java.util.logging.Logger;
 public class GameScreen implements Screen {
   	final MyGdxGame game;
 
-	Texture dropImage;
-        Texture dropImage2;
-        
+	Texture tubeDown;
+        Texture tubeUp;
         Texture bg;
         
-	Texture bucketImage;
-        Texture down;
-	Sound dropSound;
+        
+	Texture actorGoingUp;
+        Texture actorGoingDown;
+        
+	Sound coinSound;
         Sound jumpSound;
 	Music rainMusic;
+        
 	OrthographicCamera camera;
-	Rectangle bucket;
-	Array<Rectangle> raindrops;
-        Array<Rectangle> raindrops2;
+        
+	Rectangle actor;
+        
+	Array<Rectangle> tubes;
+        
 	long lastDropTime;
-	int dropsGathered;
-        int lifes = 5;
+	int score;
                 
         int highscore;
         
@@ -66,16 +69,16 @@ public class GameScreen implements Screen {
                 
                 this.highscore = highscore;
 		// load the images for the droplet and the bucket, 64x64 pixels each
-		dropImage = new Texture(Gdx.files.internal("tuberiaHieloAbajo.png"));
-                dropImage2 = new Texture(Gdx.files.internal("tuberiaHieloArriba.png"));
+		tubeDown = new Texture(Gdx.files.internal("tuberiaHieloAbajo.png"));
+                tubeUp = new Texture(Gdx.files.internal("tuberiaHieloArriba.png"));
                 
-		bucketImage = new Texture(Gdx.files.internal("supermanJump.png"));
-                down = new Texture(Gdx.files.internal("supermanDown.png"));
+		actorGoingUp = new Texture(Gdx.files.internal("supermanJump.png"));
+                actorGoingDown = new Texture(Gdx.files.internal("supermanDown.png"));
                 
                 bg = new Texture(Gdx.files.internal("fondo.jpg"));
 
 		// load the drop sound effect and the rain background "music"
-		dropSound = Gdx.audio.newSound(Gdx.files.internal("mario-coin.mp3"));
+		coinSound = Gdx.audio.newSound(Gdx.files.internal("mario-coin.mp3"));
                 jumpSound = Gdx.audio.newSound(Gdx.files.internal("mario-bros-jump.mp3"));
 		rainMusic = Gdx.audio.newMusic(Gdx.files.internal("uf.mp3"));
 		rainMusic.setLooping(true);
@@ -85,16 +88,15 @@ public class GameScreen implements Screen {
 		camera.setToOrtho(false, 800, 480);
 
 		// create a Rectangle to logically represent the bucket
-		bucket = new Rectangle();
-		bucket.x = 40; // center the bucket horizontally
-		bucket.y = 480 / 2 - 64 / 2; // bottom left corner of the bucket is 20 pixels above
+		actor = new Rectangle();
+		actor.x = 40; // center the bucket horizontally
+		actor.y = 480 / 2 - 64 / 2; // bottom left corner of the bucket is 20 pixels above
 						// the bottom screen edge
-		bucket.width = 50;
-		bucket.height = 50;
+		actor.width = 50;
+		actor.height = 50;
                 
 		// create the raindrops array and spawn the first raindrop
-		raindrops = new Array<Rectangle>();
-                raindrops2 = new Array<Rectangle>();
+		tubes = new Array<Rectangle>();
 		spawnRaindrop();
 
 	}
@@ -108,13 +110,13 @@ public class GameScreen implements Screen {
 		raindrop.y = MathUtils.random(-200, 0);
 		raindrop.width = 64;
 		raindrop.height = 300;
-		raindrops.add(raindrop);
+		tubes.add(raindrop);
                 
                 raindrop2.x = 800;
 		raindrop2.y = raindrop.y + DISTANCE;
 		raindrop2.width = 64;
 		raindrop2.height = 300;
-                raindrops2.add(raindrop2);
+                tubes.add(raindrop2);
                 
                 
 		lastDropTime = TimeUtils.nanoTime();
@@ -140,22 +142,26 @@ public class GameScreen implements Screen {
 		// all drops
 		game.batch.begin();
                 game.batch.draw(bg, 0, 0, 800, 480);
-		game.font.draw(game.batch, "SCORE: " + dropsGathered, 0, 480);
+		game.font.draw(game.batch, "SCORE: " + score, 0, 480);
 
-                
-		for (Rectangle raindrop : raindrops) {
-			game.batch.draw(dropImage, raindrop.x, raindrop.y);
+                int contadorTexture = 1;
+		for (Rectangle raindrop : tubes) {
+                    if(contadorTexture % 2 == 0){
+                        game.batch.draw(tubeUp, raindrop.x + 64, raindrop.y, -raindrop.width, raindrop.height);
+                    } else {
+                        game.batch.draw(tubeDown, raindrop.x, raindrop.y);
+                    }
+                    
+                    contadorTexture++;
+			
 		}
                 
-                for (Rectangle raindrop : raindrops2) {
-			game.batch.draw(dropImage2, raindrop.x + 64, raindrop.y, -raindrop.width, raindrop.height);
-		}
-                
+               
 		game.batch.end();
 		
                 
 		if (Gdx.input.isKeyJustPressed(Keys.UP)){
-                    bucket.y = bucket.y + JUMP * Gdx.graphics.getDeltaTime();
+                    actor.y = actor.y + JUMP * Gdx.graphics.getDeltaTime();
                     yVelocity = 320;
                     jumpSound.play(VOLUME);
                 }
@@ -163,122 +169,96 @@ public class GameScreen implements Screen {
 		
 		// make sure the bucket stays within the screen bounds
                 
-		if (bucket.y <= 0.0){
-			bucket.y = 0;
-                        if(dropsGathered > highscore){
-                            highscore = dropsGathered;
+		if (actor.y <= 0.0){
+			actor.y = 0;
+                        if(score > highscore){
+                            highscore = score;
                             try {
                                 this.saveHighScore();
                             } catch (IOException ex) {
                                 Logger.getLogger(GameScreen.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
-                        game.setScreen(new LoseScreen(game, dropsGathered, highscore));
+                        game.setScreen(new LoseScreen(game, score, highscore));
                         dispose();
                 }
-		if (bucket.y > 480 - 64)
-			bucket.y = 480 - 64;
-
-               
                 
+                
+		if (actor.y > 480 - 64)
+			actor.y = 480 - 64;
+
 		// check if we need to create a new raindrop
 		if (TimeUtils.nanoTime() - lastDropTime > 900000000)
 			spawnRaindrop();
                 
-               
-                 
-		
-                
-                
-               
-               
-                
                 yVelocity = yVelocity + GRAVITY;
-                float y = bucket.getY();
+                float y = actor.getY();
                 
                 float yChange = yVelocity * delta;
-                bucket.setPosition(bucket.x, y + yChange);
+                actor.setPosition(actor.x, y + yChange);
                 
                 Batch batch = game.batch;
                 batch.begin();
 		if(yVelocity >= 0){
-                    batch.draw(bucketImage, bucket.x, bucket.y);
+                    batch.draw(actorGoingUp, actor.x, actor.y);
                 } else {
-                   batch.draw(down, bucket.x, bucket.y);
+                   batch.draw(actorGoingDown, actor.x, actor.y);
                 }
 		batch.end();
 
 		// move the raindrops, remove any that are beneath the bottom edge of
 		// the screen or that hit the bucket. In the later case we play back
 		// a sound effect as well.
-		Iterator<Rectangle> iter = raindrops.iterator();
+		Iterator<Rectangle> iter = tubes.iterator();
+                
+                Boolean cuento  = true;
                 
 		while (iter.hasNext()) {
 			Rectangle raindrop = iter.next();
                         
                        
-                        if(dropsGathered > 5 && dropsGathered <= 10){
+                        if(score > 5 && score <= 10){
                            raindrop.x -= 600 * Gdx.graphics.getDeltaTime();
-                        } else if(dropsGathered > 10){
+                           
+                        } else if(score > 10){
                             raindrop.x -= 700 * Gdx.graphics.getDeltaTime(); 
                         } else {
                             raindrop.x -= 500 * Gdx.graphics.getDeltaTime(); 
                         }
                         
                         
+                        
 			if (raindrop.x + 64 < 0){
                             iter.remove();
-                            dropsGathered += 1;
-                            dropSound.play(VOLUME);
+                            if(cuento == true){
+                                score += 1;
+                                coinSound.play(VOLUME);
+                                cuento  = false;
+                            } else {
+                                cuento = true;
+                            }
+                            
                         }
 				
 				
-			if (raindrop.overlaps(bucket)) {
+			if (raindrop.overlaps(actor)) {
                             
-                            if(dropsGathered > highscore){
-                                highscore = dropsGathered;
+                            if(score > highscore){
+                                highscore = score;
                                 try {
                                     this.saveHighScore();
                                 } catch (IOException ex) {
                                     Logger.getLogger(GameScreen.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                             }
-                            game.setScreen(new LoseScreen(game, dropsGathered, highscore));
+                            game.setScreen(new LoseScreen(game, score, highscore));
                             dispose();
                             
 			}
-                        
-                        
+                               
 		}
                 
-                Iterator<Rectangle> iter2 = raindrops2.iterator();
-                
-		while (iter2.hasNext()) {
-			Rectangle raindrop = iter2.next();
-                        
-                       
-                        
-                        if(dropsGathered > 5 && dropsGathered <= 10){
-                           raindrop.x -= 600 * Gdx.graphics.getDeltaTime();
-                        } else if(dropsGathered > 10){
-                            raindrop.x -= 700 * Gdx.graphics.getDeltaTime(); 
-                        } else {
-                            raindrop.x -= 500 * Gdx.graphics.getDeltaTime(); 
-                        }
-                        
-
-                        
-			if (raindrop.overlaps(bucket)) {
-                            if(dropsGathered > highscore){
-                                highscore = dropsGathered;
-                            }
-                            game.setScreen(new LoseScreen(game, dropsGathered, highscore));
-                            dispose();
-                            
-			}
-                        
-                        
-		}
+               
 	}
         
         public void saveHighScore() throws FileNotFoundException, IOException{
@@ -321,9 +301,9 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		dropImage.dispose();
-		bucketImage.dispose();
-		dropSound.dispose();
+		tubeDown.dispose();
+		actorGoingUp.dispose();
+		coinSound.dispose();
 		rainMusic.dispose();
 	}
 

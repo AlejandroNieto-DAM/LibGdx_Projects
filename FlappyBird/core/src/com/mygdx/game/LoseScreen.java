@@ -42,9 +42,9 @@ public class LoseScreen implements Screen {
 		game.batch.begin();
                 game.batch.draw(bg, 0, 0, 800, 480);
 
-		game.font.draw(game.batch, "You Loose noob go kill yourself. Your score is:  " + this.score, 100, 200);
-                game.font.draw(game.batch, "The highscore now is:  " + this.highscore, 100, 150);
-		game.font.draw(game.batch, "Tap anywhere to begin again!!", 100, 100);
+		game.font.draw(game.batch, "Oooohhh. Your score is:  " + this.score, 200, 200);
+                game.font.draw(game.batch, "The highscore now is:  " + this.highscore, 200, 150);
+		game.font.draw(game.batch, "Tap anywhere to begin again!!", 200, 100);
 		game.batch.end();
                 
                 
