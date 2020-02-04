@@ -31,11 +31,26 @@ public class Avion extends DynamicGameObject {
 	}
 
 	public void update (float deltaTime, float bobBoundsX, float bobBoundsY) {
-		position.add(velocity.x * deltaTime, velocity.y * deltaTime);
+		
+                position.add(velocity.x * deltaTime, velocity.y * deltaTime);
 		bounds.x = position.x - SQUIRREL_WIDTH / 2;
 		bounds.y = position.y - SQUIRREL_HEIGHT / 2;
                 
-                if(bobBoundsX - bounds.x < 20 )
+               
+                System.out.println("distancia" + (bobBoundsX - position.x));
+                System.out.println("distanciay" + (bobBoundsY - position.y));
+
+                
+                if(bobBoundsX - position.x > -3  && bobBoundsX - position.x < 0  && bobBoundsY - position.y > -3 && bobBoundsY - position.y < 0){
+                    position.x = (bounds.x - SQUIRREL_WIDTH * deltaTime);
+                    position.y = (bounds.y - SQUIRREL_HEIGHT * deltaTime);
+                    
+                }
+                
+                if(bobBoundsX - position.x < -3  && bobBoundsX - position.x > 0  && bobBoundsY - position.y < -3 && bobBoundsY - position.y > 0){
+                    position.x = (bounds.x + SQUIRREL_WIDTH * deltaTime);
+                    position.y = (bounds.y + SQUIRREL_HEIGHT * deltaTime);
+                }
 
 		if (position.x < SQUIRREL_WIDTH / 2) {
 			position.x = SQUIRREL_WIDTH / 2;
@@ -47,4 +62,21 @@ public class Avion extends DynamicGameObject {
 		}
 		stateTime += deltaTime;
 	}
+        
+        public void updateNormal (float deltaTime){
+                position.add(velocity.x * deltaTime, velocity.y * deltaTime);
+		bounds.x = position.x - SQUIRREL_WIDTH / 2;
+		bounds.y = position.y - SQUIRREL_HEIGHT / 2;
+                
+                
+                if (position.x < SQUIRREL_WIDTH / 2) {
+			position.x = SQUIRREL_WIDTH / 2;
+			velocity.x = SQUIRREL_VELOCITY;
+		}
+		if (position.x > World.WORLD_WIDTH - SQUIRREL_WIDTH / 2) {
+			position.x = World.WORLD_WIDTH - SQUIRREL_WIDTH / 2;
+			velocity.x = -SQUIRREL_VELOCITY;
+		}
+		stateTime += deltaTime;
+        }
 }

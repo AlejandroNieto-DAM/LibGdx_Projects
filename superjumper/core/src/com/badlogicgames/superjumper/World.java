@@ -92,7 +92,7 @@ public class World {
 				squirrels.add(squirrel);
 			}
                         
-                        if (rand.nextFloat() > 0f) {
+                        if (rand.nextFloat() > 0.5f) {
 				Avion avion = new Avion(platform.position.x + rand.nextFloat(), platform.position.y
 					+ Avion.SQUIRREL_HEIGHT + rand.nextFloat() * 2);
 				planes.add(avion);
@@ -153,7 +153,16 @@ public class World {
 		int len = planes.size();
 		for (int i = 0; i < len; i++) {
 			Avion plane = planes.get(i);
-			plane.update(deltaTime, bob.bounds.x, bob.bounds.y);
+                        if(bob.bounds.x - plane.bounds.x > -3  && bob.bounds.x - plane.bounds.x < 0  && bob.bounds.y - plane.bounds.y > -3 && bob.bounds.y - plane.bounds.y < 0){
+                            plane.update(deltaTime, bob.bounds.x, bob.bounds.y);
+                            
+                        }else if(bob.bounds.x - plane.bounds.x < -3  && bob.bounds.x - plane.bounds.x > 0  && bob.bounds.y - plane.bounds.y < -3 && bob.bounds.y - plane.bounds.y > 0){
+                         
+                            plane.update(deltaTime, bob.bounds.x, bob.bounds.y);
+                            
+                        }else {
+                            plane.updateNormal(deltaTime);
+                        }
 		}
 	}
 

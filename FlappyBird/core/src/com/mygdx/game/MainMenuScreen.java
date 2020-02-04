@@ -34,33 +34,12 @@ public class MainMenuScreen implements Screen {
 
 	}
         
-        public void readHighScore() throws FileNotFoundException, IOException, ClassNotFoundException{
-            File fichero = new File("HighScore.dat");
-
-            if(fichero.length() > 0){
-
-                ObjectInputStream dataIs = new ObjectInputStream(new FileInputStream(fichero));
-
-                int score = (int) dataIs.readInt(); 
-                
-                dataIs.close();
-                
-                this.highscore = score;
-                
-            }     
-           
-        }
+        
 
 	@Override
 	public void render(float delta) {
 		
-            try {
-                this.readHighScore();
-            } catch (IOException ex) {
-                Logger.getLogger(MainMenuScreen.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(MainMenuScreen.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            
 
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
