@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
-public class Pistol extends Image {
+public class Seta extends Image {
     TextureRegion stand, jump;
     Animation walk;
 
@@ -15,7 +15,8 @@ public class Pistol extends Image {
     boolean canJump = false;
     boolean isFacingRight = true;
     public TiledMapTileLayer layer;
-    Texture koalaTexture;
+    TextureRegion koalaTexture;
+    TextureRegion dead;
 
     Boolean cambioDireccion;
     
@@ -23,15 +24,35 @@ public class Pistol extends Image {
     final float MAX_VELOCITY = 5f;
     final float DAMPING = 0.87f;
 
-    public Pistol() {
+    public Seta() {
         cambioDireccion = false;
-        final float width = 18;
-        final float height = 26;
+        final float width = 16;
+        final float height = 32;
         this.setSize(1, height / width);
 
-        koalaTexture = new Texture("pistol.png");
+        Texture e = new Texture("nes.png");
+        TextureRegion[][] e1 = TextureRegion.split(e, 16, 32);
+        
+        koalaTexture = e1[2][28];
+        //dead = e1[0][2];
         
     
+    }
+    
+    public boolean dead(float x, float y){
+        
+        boolean isDead = false;
+        
+        System.out.println("xS " + this.getX());
+        System.out.println("y " + this.getY());
+        
+        if((y < this.getY() + 1f) && (y > this.getY() + 0.5f) && (x > this.getX() - 0.5f) && (x < this.getX() + 0.5f)){
+            koalaTexture = dead;
+            isDead = true;
+        }
+        
+        return isDead;
+        
     }
 
     public void act(float delta) {

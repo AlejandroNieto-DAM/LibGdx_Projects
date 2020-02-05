@@ -5,10 +5,13 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.utils.Array;
 
 public class Koala extends Image {
-    TextureRegion stand, jump;
-    Animation walk;
+    TextureRegion stand;
+    Animation walk, jump;
+    
+    TextureRegion stand1, jump1;
 
     float time = 0;
     float xVelocity = 0;
@@ -21,27 +24,52 @@ public class Koala extends Image {
     final float GRAVITY = -2.5f;
     final float MAX_VELOCITY = 10f;
     final float DAMPING = 0.87f;
+    
+    public int GRANDE = 2;
+    public int NORMAL = 1;
+    
+    public int state = NORMAL;
 
     public Koala() {
-        final float width = 363;
-        final float height = 458;
+        final float width = 18;
+        final float height = 26;
         this.setSize(1, height / width);
 
-        Texture koalaTexture = new Texture("1.png");
-        TextureRegion[][] grid = TextureRegion.split(koalaTexture, (int) width, (int) height);
+        Texture koalaTexture = new Texture("sonicSprites.png");
+        
+        stand  = new TextureRegion(koalaTexture,8,17,40,40);
 
-        Texture jumpTexture = new Texture("jump.png");
-        TextureRegion[][] grid2 = TextureRegion.split(jumpTexture, 362, 483);
-        jump = grid2[0][0];
+        Array<TextureRegion> frames = new Array();
+        //JUMPING
+        for(int i = 0; i < 5;i++){
+            frames.add(new TextureRegion(koalaTexture,8+40*i,330,40,40));
+        }
+        jump = new Animation(0.1f,frames);
+        jump.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
         
-        Texture standTexture = new Texture("stand.png");
-        TextureRegion[][] grid3 = TextureRegion.split(standTexture, 232, 439);
-        stand = grid3[0][0];
+        frames.clear();
         
-        
-        walk = new Animation(0.05f, grid[0][0], grid[0][1], grid[0][2], grid[0][3], grid[0][4], grid[1][0], grid[1][1], grid[1][2], grid[1][3], grid[1][4]);
+        for(int i = 0; i < 8;i++){
+            frames.add(new TextureRegion(koalaTexture,8+44*i,66,41,40));
+        }
+        walk = new Animation(0.1f,frames);
         walk.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
         
+        
+        
+    }
+    
+    public void grande(){
+        
+        Texture koalaTexture = new Texture("koalio.png");
+        TextureRegion[][] grid = TextureRegion.split(koalaTexture, 18, 26);
+
+        stand1 = grid[0][0];
+        jump1 = grid[0][1];
+        walk = new Animation(0.15f, grid[0][2], grid[0][3], grid[0][4]);
+        walk.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
+        
+        state = GRANDE;
     }
     
     public void stunt(){
@@ -50,6 +78,12 @@ public class Koala extends Image {
         } else {
             xVelocity += 10;
         }
+    }
+    
+    public void bump(){
+        yVelocity =  0;
+        yVelocity = yVelocity + MAX_VELOCITY * 4;  
+        yVelocity = yVelocity + GRAVITY;
     }
 
     public void act(float delta) {
@@ -113,14 +147,25 @@ public class Koala extends Image {
     }
 
     public void draw(Batch batch, float parentAlpha) {
-        TextureRegion frame;
+        TextureRegion frame = null;
 
-        if (yVelocity != 0) {
-            frame = jump;
-        } else if (xVelocity != 0) {
-            frame = (TextureRegion) walk.getKeyFrame(time);
-        } else {
-            frame = stand;
+        
+        if(state == NORMAL){
+            if (yVelocity != 0) {
+                frame = (TextureRegion) jump.getKeyFrame(time);
+            } else if (xVelocity != 0) {
+                frame = (TextureRegion) walk.getKeyFrame(time);
+            } else {
+                frame = stand;
+            }
+        } else if(state == GRANDE){
+            if (yVelocity != 0) {
+                frame = jump1;
+            } else if (xVelocity != 0) {
+                frame = (TextureRegion) walk.getKeyFrame(time);
+            } else {
+                frame = stand1;
+            }
         }
 
         if (isFacingRight) {

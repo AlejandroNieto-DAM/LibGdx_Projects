@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
-public class Tiraco extends Image {
+public class Planta extends Image {
     TextureRegion stand, jump;
     Animation walk;
 
@@ -15,7 +15,7 @@ public class Tiraco extends Image {
     boolean canJump = false;
     boolean isFacingRight = true;
     public TiledMapTileLayer layer;
-    Texture koalaTexture;
+    TextureRegion koalaTexture;
     
     float positionToComeX = 0;
     float positionToComeY = 0;
@@ -29,13 +29,19 @@ public class Tiraco extends Image {
     final float MAX_VELOCITY = 5f;
     final float DAMPING = 0.87f;
 
-    public Tiraco() {
+    public Planta() {
         cambioDireccion = false;
-        final float width = 18;
-        final float height = 26;
+        final float width = 16;
+        final float height = 32;
         this.setSize(1, height / width);
-
-        koalaTexture = new Texture("bala.png");
+        
+        
+        Texture e = new Texture("nes.png");
+        TextureRegion[][] e1 = TextureRegion.split(e, 16, 32);
+        
+        
+        walk = new Animation(0.5f, e1[0][12], e1[0][13]);
+        walk.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
         
     
     }
@@ -51,69 +57,20 @@ public class Tiraco extends Image {
             positionToComeY = this.getY() - ((this.getY() - y) / 15);
         }
        
-       
-       
 
     }
 
     public void act(float delta) {
         time = time + delta;
         
-        
-        float x;
-        float y;  
-
-        //yVelocity = yVelocity + GRAVITY;
-
-        if(positionToComeX != 0){
-           x = positionToComeX;
-           y = positionToComeY;  
-        } else {
-           x = this.getX();
-           y = this.getY();
-        }
-        
-        
-        
-        float xChange = xVelocity * delta;
-        float yChange = yVelocity * delta;
-
-        xVelocity = -1 * MAX_VELOCITY;
-        
-        if (canMoveTo(x + xChange, y, false) == false) {
-            xVelocity = xChange = 0;
-            if(!canMoveTo(x + xChange, y, false)){
-                parar = true;
-            }
-        }
-
-        if (canMoveTo(x, y + yChange, yVelocity > 0) == false) {
-            canJump = yVelocity < 0;
-            yVelocity = yChange = 0;
-            if(!canMoveTo(x, y + yChange, yVelocity > 0)){
-                parar = true;
-            }
-        }
-
-        this.setPosition(x + xChange, y + yChange);
-
-        xVelocity = xVelocity * DAMPING;
-        if (Math.abs(xVelocity) < 0.5f) {
-            xVelocity = 0;
-        }
     }
 
     public void draw(Batch batch, float parentAlpha) {
         
-        //if(!parar){
-            if (isFacingRight) {
-                batch.draw(koalaTexture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
-            } else {
-                batch.draw(koalaTexture, this.getX() + this.getWidth(), this.getY(), -1 * this.getWidth(), this.getHeight());
-            } 
-        //}
-        
-        
+        TextureRegion frame = (TextureRegion) walk.getKeyFrame(time);
+          
+        batch.draw(frame, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+
     }
 
     private boolean canMoveTo(float startX, float startY, boolean shouldDestroy) {
