@@ -47,7 +47,7 @@ public class Seta extends Image {
         System.out.println("y " + this.getY());
         
         if((y < this.getY() + 1f) && (y > this.getY() + 0.5f) && (x > this.getX() - 0.5f) && (x < this.getX() + 0.5f)){
-            koalaTexture = dead;
+            //koalaTexture = dead;
             isDead = true;
         }
         

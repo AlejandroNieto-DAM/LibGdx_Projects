@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.maps.tiled.renderers.*;
 import com.badlogic.gdx.scenes.scene2d.*;
-import Actors.Koala;
+import Actors.MainActor;
 import Actors.Minion;
 import Actors.Planta;
 import Actors.Seta;
@@ -18,26 +18,27 @@ public class MainScreen implements Screen {
     TiledMap map;
     OrthogonalTiledMapRenderer renderer;
     OrthographicCamera camera;
-    Koala koala;
     MyGdxGame game;
     Double tiempo;
     
-    ArrayList<Bala> balls;
-    ArrayList<Minion> pistol;
+    MainActor mainActor;
+    
+    ArrayList<Bala> canonAmmo;
+    ArrayList<Minion> minions;
     ArrayList<Seta> setas;
     
     ArrayList<Integer> positionSetasX;
     ArrayList<Integer> positionSetasY;
 
-   
-
-
+    
     Planta a;
     
     MainScreen(MyGdxGame game){
         this.game = game;
     }
 
+    
+    @Override
     public void show() {
         map = new TmxMapLoader().load("mapy.tmx");
         final float pixelsPerTile = 16;
@@ -49,7 +50,36 @@ public class MainScreen implements Screen {
 
         positionSetasX = new ArrayList();
         positionSetasY = new ArrayList();
+  
+        mainActor = new MainActor();
+         
+        minions = new ArrayList();
+        canonAmmo = new ArrayList();
+        a = new Planta();
+        setas = new ArrayList();
         
+        mainActor.layer = (TiledMapTileLayer) map.getLayers().get("walls");
+
+        mainActor.setPosition(10, 10);
+        a.setPosition(41.5f, 6);
+        
+        stage.addActor(mainActor);
+        stage.addActor(a);
+        
+        tiempo = 0.0;
+        
+        for(int i = 0; i < 10; i++){
+            minionSpawn();
+        }
+        
+        
+        for(int i = 0; i < 5; i++){
+            canonAmmoSpawn();
+        }
+        
+    }
+    
+    public void setasPositions(){
         positionSetasX.add(24);
         positionSetasY.add(13);
         
@@ -58,45 +88,9 @@ public class MainScreen implements Screen {
         
         positionSetasX.add(109);
         positionSetasY.add(15);
-        
-        //positionSetasX.add(24);
-        //positionSetasY.add(13);
-        
-        
-        koala = new Koala();
-        
-        
-        pistol = new ArrayList();
-        balls = new ArrayList();
-        a = new Planta();
-        setas = new ArrayList();
-        
-        koala.layer = (TiledMapTileLayer) map.getLayers().get("walls");
-        
-        
-        
-        
-        koala.setPosition(221, 10);
-        a.setPosition(41.2f, 6);
-        
-        stage.addActor(koala);
-        stage.addActor(a);
-        
-
-        tiempo = 0.0;
-        
-        for(int i = 0; i < 10; i++){
-            pistolSpawn();
-        }
-        
-        
-        for(int i = 0; i < 5; i++){
-            ballSpawn();
-        }
-        
     }
     
-    public void pistolSpawn(){
+    public void minionSpawn(){
         Minion p = new Minion();
         
         p.layer = (TiledMapTileLayer) map.getLayers().get("walls");
@@ -108,7 +102,7 @@ public class MainScreen implements Screen {
         p.setPosition(pos2, 40);
         stage.addActor(p);
         
-        pistol.add(p);
+        minions.add(p);
     }
     
     public void setaSpawn(float x, float y){
@@ -122,7 +116,7 @@ public class MainScreen implements Screen {
         setas.add(p);
     }
     
-    public void ballSpawn(){
+    public void canonAmmoSpawn(){
         Bala p = new Bala();
         
         p.layer = (TiledMapTileLayer) map.getLayers().get("walls");
@@ -135,89 +129,19 @@ public class MainScreen implements Screen {
         p.setPosition(pos2, pos24);
         stage.addActor(p);
         
-        balls.add(p);
-    }
-    
-    public void checkCollisions(float delta){
-        tiempo += delta;
-        
-        for(int i = 0;  i < pistol.size(); i++){
-            
-            if(pistol.get(i).dead(koala.getX(), koala.getY()) == true){
-
-                koala.bump();
-                
-            }
-        }
-        
-        for(int i = 0 ; i < positionSetasX.size(); i++){
-            if(koala.getX() < positionSetasX.get(i) + 1 && koala.getX() > positionSetasX.get(i) - 1 && koala.getY() > positionSetasY.get(i) - 2 && koala.getY() < positionSetasX.get(i)){
-                setaSpawn(positionSetasX.get(i), positionSetasY.get(i));
-                positionSetasX.remove(i);
-                positionSetasY.remove(i);                
-            }
-        }
-        
-        for(int i = 0;  i < setas.size(); i++){
-            
-            if(setas.get(i).dead(koala.getX(), koala.getY()) == true){
-                koala.grande();  
-                setas.get(i).remove();
-                setas.remove(i);
-            }
-            
-        }
-        
-        for(int i = 0; i < balls.size(); i++){
-            
-            if(koala.getX() - balls.get(i).getX() < 3 && koala.getY() - balls.get(i).getY() < 3 && balls.get(i).getX() - koala.getX() < 3 && balls.get(i).getY() - koala.getY() < 3){
-               balls.get(i).positionToCome(koala.getX(), koala.getY());
-            }else{
-                balls.get(i).positionToCome(0, 0);
-            }
-        
-            if(koala.getX() - balls.get(i).getX() < 1.5 && koala.getY() - balls.get(i).getY() < 1.5 && balls.get(i).getX() - koala.getX() < 1.5 && balls.get(i).getY() - koala.getY() < 1.5){
-                   koala.stunt();
-            }   
-        }     
-        
+        canonAmmo.add(p);
     }
 
+    @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.5f, 0.5f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if(koala.getX() > 13 && koala.getX() < 227){
-           camera.position.x = koala.getX();
-           
-        }
-           
-        if(koala.getX() < 0){
-            koala.setPosition(0, koala.getY());
-        }
-           
-        if(koala.getX() > 239){
-            koala.setPosition(227, koala.getY());
-        }
-           
-        if(koala.getY() < -20){
-            game.setScreen(new LooseScreen(game));
-            dispose();
-        } 
+        this.mainActorLimits();
         
-        
-        if(koala.getX() > 233){
-            game.setScreen(new LooseScreen(game));
-            dispose();
-        }
-        
-        System.out.println("Koala y " + koala.getY());
-        System.out.println("Koala x " + koala.getX());
+        //System.out.println("Koala y " + koala.getY());
+        //System.out.println("Koala x " + koala.getX());
 
-        //System.out.println("Pistol y " + pistol.getY());
-        //System.out.println("Pistol x " + pistol.getX());
-
-        
         this.checkCollisions(delta);
         
         camera.update(); 
@@ -228,20 +152,119 @@ public class MainScreen implements Screen {
         stage.act(delta);
         stage.draw();
     }
+    
+    public void mainActorLimits(){
+        if(mainActor.getX() > 13 && mainActor.getX() < 227){
+           camera.position.x = mainActor.getX();
+           
+        }
+           
+        if(mainActor.getX() < 0){
+            mainActor.setPosition(0, mainActor.getY());
+        }
+           
+        if(mainActor.getX() > 239){
+            mainActor.setPosition(227, mainActor.getY());
+        }
+           
+        if(mainActor.getY() < -20){
+            game.setScreen(new LooseScreen(game));
+            dispose();
+        } 
+        
+        
+        if(mainActor.getX() > 233){
+            game.setScreen(new LooseScreen(game));
+            dispose();
+        }
+    }
+    
+    public void checkCollisions(float delta){
+        tiempo += delta;
+        
+        this.setasCollisions();
+        this.minionCollisions();
+        this.canonAmmoCollisions();
+        
+        
+        
+        if(a.getX() + 0.5 > mainActor.getX() && a.getX() - 0.5 < mainActor.getX() && a.getY() + 1 > mainActor.getY()){
+            game.setScreen(new LooseScreen(game));
+            dispose();
+        }
+  
+    }
+    
+    public void minionCollisions(){
+        for(int i = 0;  i < minions.size(); i++){
+            if(minions.get(i).dead(mainActor.getX(), mainActor.getY()) == true){
+                mainActor.bump();
+            }
+        }
+        
+        for(int i = 0;  i < minions.size(); i++){
+            if(minions.get(i).getState() == 3){
+                minions.get(i).remove();
+            }
+        }
+    }
+    
+    public void setasCollisions(){
+        for(int i = 0 ; i < positionSetasX.size(); i++){
+            if(mainActor.getX() < positionSetasX.get(i) + 1 && mainActor.getX() > positionSetasX.get(i) - 1 && mainActor.getY() > positionSetasY.get(i) - 2 && mainActor.getY() < positionSetasX.get(i)){
+                setaSpawn(positionSetasX.get(i), positionSetasY.get(i));
+                positionSetasX.remove(i);
+                positionSetasY.remove(i);                
+            }
+        }
+        
+        for(int i = 0;  i < setas.size(); i++){
+            
+            if(setas.get(i).dead(mainActor.getX(), mainActor.getY()) == true){
+                
+                if(mainActor.getState() == 1){ 
+                    System.out.println("Entramos aqui eyyo");
+                    mainActor.grande();  
+                    setas.get(i).remove();
+                    setas.remove(i);
+                }   
+            } 
+        }
+    }
+    
+    public void canonAmmoCollisions(){
+        for(int i = 0; i < canonAmmo.size(); i++){
+            
+            if(mainActor.getX() - canonAmmo.get(i).getX() < 3 && mainActor.getY() - canonAmmo.get(i).getY() < 3 && canonAmmo.get(i).getX() - mainActor.getX() < 3 && canonAmmo.get(i).getY() - mainActor.getY() < 3){
+               canonAmmo.get(i).positionToCome(mainActor.getX(), mainActor.getY());
+            }else{
+                canonAmmo.get(i).positionToCome(0, 0);
+            }
+        
+            if(mainActor.getX() - canonAmmo.get(i).getX() < 1.5 && mainActor.getY() - canonAmmo.get(i).getY() < 1.5 && canonAmmo.get(i).getX() - mainActor.getX() < 1.5 && canonAmmo.get(i).getY() - mainActor.getY() < 1.5){
+                   mainActor.stunt();
+            }   
+        } 
+    }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public void hide() {
     }
 
+    @Override
     public void pause() {
     }
 
+    @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, 20 * width / height, 20);
     }
 
+    @Override
     public void resume() {
     }
 }

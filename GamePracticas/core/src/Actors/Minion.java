@@ -20,6 +20,8 @@ public class Minion extends Image {
 
     Boolean cambioDireccion;
     
+    public int state = 1;
+    
     final float GRAVITY = -2.5f;
     final float MAX_VELOCITY = 5f;
     final float DAMPING = 0.87f;
@@ -43,16 +45,24 @@ public class Minion extends Image {
         
         boolean isDead = false;
         
-        System.out.println("xS " + this.getX());
-        System.out.println("y " + this.getY());
+        //System.out.println("xS " + this.getX());
+        //System.out.println("y " + this.getY());
         
-        if((y < this.getY() + 1f) && (y > this.getY() + 0.5f) && (x > this.getX() - 0.5f) && (x < this.getX() + 0.5f)){
+        if((y < this.getY() + 1f) && (y > this.getY() + 0.3f) && (x > this.getX() - 0.5f) && (x < this.getX() + 0.5f)){
             koalaTexture = dead;
             isDead = true;
+            
+            state++;
         }
         
         return isDead;
         
+        
+        
+    }
+    
+    public int getState(){
+        return state;
     }
 
     public void act(float delta) {

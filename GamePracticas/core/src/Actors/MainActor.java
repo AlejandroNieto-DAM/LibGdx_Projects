@@ -7,7 +7,7 @@ import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
 
-public class Koala extends Image {
+public class MainActor extends Image {
     TextureRegion stand;
     Animation walk, jump;
     
@@ -29,13 +29,15 @@ public class Koala extends Image {
     public int NORMAL = 1;
     
     public int state = NORMAL;
+    
+        Texture koalaTexture;
 
-    public Koala() {
+    public MainActor() {
         final float width = 18;
         final float height = 26;
         this.setSize(1, height / width);
 
-        Texture koalaTexture = new Texture("sonicSprites.png");
+        koalaTexture = new Texture("sonicSprites.png");
         
         stand  = new TextureRegion(koalaTexture,8,17,40,40);
 
@@ -69,7 +71,37 @@ public class Koala extends Image {
         walk = new Animation(0.15f, grid[0][2], grid[0][3], grid[0][4]);
         walk.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
         
+       
+        
         state = GRANDE;
+    }
+    
+    
+    public void chico(){
+        
+        stand  = new TextureRegion(koalaTexture,8,17,40,40);
+
+        Array<TextureRegion> frames = new Array();
+        //JUMPING
+        for(int i = 0; i < 5;i++){
+            frames.add(new TextureRegion(koalaTexture,8+40*i,330,40,40));
+        }
+        jump = new Animation(0.1f,frames);
+        jump.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
+        
+        frames.clear();
+        
+        for(int i = 0; i < 8;i++){
+            frames.add(new TextureRegion(koalaTexture,8+44*i,66,41,40));
+        }
+        walk = new Animation(0.1f,frames);
+        walk.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
+        
+        state = NORMAL;
+    }
+    
+    public int getState(){
+        return state;
     }
     
     public void stunt(){
@@ -84,6 +116,10 @@ public class Koala extends Image {
         yVelocity =  0;
         yVelocity = yVelocity + MAX_VELOCITY * 4;  
         yVelocity = yVelocity + GRAVITY;
+    }
+    
+    public float getYVelocity(){
+        return yVelocity;
     }
 
     public void act(float delta) {
