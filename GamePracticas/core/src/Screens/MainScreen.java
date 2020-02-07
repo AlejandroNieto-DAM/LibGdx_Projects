@@ -10,8 +10,11 @@ import Actors.Minion;
 import Actors.Planta;
 import Actors.Seta;
 import Actors.Bala;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mygdx.game.MyGdxGame;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class MainScreen implements Screen {
     Stage stage;
@@ -67,6 +70,7 @@ public class MainScreen implements Screen {
         stage.addActor(a);
         
         tiempo = 0.0;
+        this.setasPositions();
         
         for(int i = 0; i < 10; i++){
             minionSpawn();
@@ -196,17 +200,24 @@ public class MainScreen implements Screen {
     }
     
     public void minionCollisions(){
-        for(int i = 0;  i < minions.size(); i++){
-            if(minions.get(i).dead(mainActor.getX(), mainActor.getY()) == true){
+        
+        Iterator<Minion> iter = minions.iterator();
+        int contador = 0;
+        while(iter.hasNext()){
+            Minion a = iter.next();
+            
+            if(a.dead(mainActor.getX(), mainActor.getY()) == true){
                 mainActor.bump();
             }
+            
+            if(a.getState() == 3){
+               a.setY(-10f);
+               iter.remove();
+            }
+            
+            contador++;
         }
         
-        for(int i = 0;  i < minions.size(); i++){
-            if(minions.get(i).getState() == 3){
-                minions.get(i).remove();
-            }
-        }
     }
     
     public void setasCollisions(){

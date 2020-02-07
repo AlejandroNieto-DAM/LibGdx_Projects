@@ -89,6 +89,7 @@ public class Minion extends Image {
             }
         }
         
+        
         if(cambioDireccion){
             xVelocity = velocidad1;
         } else {

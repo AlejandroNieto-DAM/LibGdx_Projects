@@ -75,30 +75,13 @@ public class Bala extends Image {
         } else {
            x = this.getX();
            y = this.getY();
-        }
-        
-        
+        } 
         
         float xChange = xVelocity * delta;
         float yChange = yVelocity * delta;
 
         xVelocity = -1 * MAX_VELOCITY;
         
-        /*if (canMoveTo(x + xChange, y, false) == false) {
-            xVelocity = xChange = 0;
-            if(!canMoveTo(x + xChange, y, false)){
-                parar = true;
-            }
-        }
-
-        if (canMoveTo(x, y + yChange, yVelocity > 0) == false) {
-            canJump = yVelocity < 0;
-            yVelocity = yChange = 0;
-            if(!canMoveTo(x, y + yChange, yVelocity > 0)){
-                parar = true;
-            }
-        }*/
-
         this.setPosition(x + xChange, y + yChange);
 
         xVelocity = xVelocity * DAMPING;
@@ -109,13 +92,13 @@ public class Bala extends Image {
 
     public void draw(Batch batch, float parentAlpha) {
         
-        //if(!parar){
-            if (isFacingRight) {
-                batch.draw(koalaTexture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
-            } else {
-                batch.draw(koalaTexture, this.getX() + this.getWidth(), this.getY(), -1 * this.getWidth(), this.getHeight());
-            } 
-        //}
+        
+        if (isFacingRight) {
+            batch.draw(koalaTexture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        } else {
+            batch.draw(koalaTexture, this.getX() + this.getWidth(), this.getY(), -1 * this.getWidth(), this.getHeight());
+        } 
+        
         
         
     }

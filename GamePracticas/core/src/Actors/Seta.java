@@ -33,21 +33,15 @@ public class Seta extends Image {
         Texture e = new Texture("nes.png");
         TextureRegion[][] e1 = TextureRegion.split(e, 16, 32);
         
-        koalaTexture = e1[2][28];
-        //dead = e1[0][2];
-        
+        koalaTexture = e1[2][28];    
     
     }
     
     public boolean dead(float x, float y){
         
         boolean isDead = false;
-        
-        System.out.println("xS " + this.getX());
-        System.out.println("y " + this.getY());
-        
+
         if((y < this.getY() + 1f) && (y > this.getY() + 0.5f) && (x > this.getX() - 0.5f) && (x < this.getX() + 0.5f)){
-            //koalaTexture = dead;
             isDead = true;
         }
         
