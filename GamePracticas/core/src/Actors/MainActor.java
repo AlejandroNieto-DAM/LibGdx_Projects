@@ -30,6 +30,8 @@ public class MainActor extends Image {
     
     public int state = NORMAL;
     
+    public Boolean hitState = false;
+    
         Texture koalaTexture;
 
     public MainActor() {
@@ -126,27 +128,33 @@ public class MainActor extends Image {
         time = time + delta;
         
         
-        boolean upTouched = Gdx.input.isTouched() && Gdx.input.getY() < Gdx.graphics.getHeight() / 2;
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) || upTouched) {
-            if (canJump) {
-                yVelocity = yVelocity + MAX_VELOCITY * 4;     
-            } 
-            
-            canJump = false;    
-        }
         
+        //System.out.println("hitState --> " + hitState);
+        
+        
+            
+            boolean upTouched = Gdx.input.isTouched() && Gdx.input.getY() < Gdx.graphics.getHeight() / 2;
+            if (Gdx.input.isKeyPressed(Input.Keys.UP) || upTouched) {
+                if (canJump) {
+                    yVelocity = yVelocity + MAX_VELOCITY * 4;     
+                } 
 
-        boolean leftTouched = Gdx.input.isTouched() && Gdx.input.getX() < Gdx.graphics.getWidth() / 3;
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || leftTouched) {
-            xVelocity = -1 * MAX_VELOCITY;
-            isFacingRight = false;
-        }
+                canJump = false;    
+            }
+        
+           boolean leftTouched = Gdx.input.isTouched() && Gdx.input.getX() < Gdx.graphics.getWidth() / 3;
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || leftTouched) {
+                xVelocity = -1 * MAX_VELOCITY;
+                isFacingRight = false;
+            }
 
-        boolean rightTouched = Gdx.input.isTouched() && Gdx.input.getX() > Gdx.graphics.getWidth() * 2 / 3;
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || rightTouched) {
-            xVelocity = MAX_VELOCITY;
-            isFacingRight = true;
-        }
+            boolean rightTouched = Gdx.input.isTouched() && Gdx.input.getX() > Gdx.graphics.getWidth() * 2 / 3;
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || rightTouched) {
+                xVelocity = MAX_VELOCITY;
+                isFacingRight = true;
+            } 
+        
+        
 
         yVelocity = yVelocity + GRAVITY;
 
@@ -220,7 +228,7 @@ public class MainActor extends Image {
 
             int y = (int) startY;
             while (y < endY) {
-                if (layer.getCell(x, y) != null) {
+                if (layer.getCell(x, y) != null ) {
                     if (shouldDestroy) {
                         layer.setCell(x, y, null);
                     }

@@ -1,6 +1,6 @@
 package com.mygdx.game;
 
-import Screens.MainMenuScreen;
+import Screens.FirstScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -17,6 +17,6 @@ public class MyGdxGame extends Game {
             batch = new SpriteBatch();
             font = new BitmapFont(Gdx.files.internal("fuente_juego.fnt"));
             font.setColor(Color.BLACK);
-            this.setScreen(new MainMenuScreen(this));
+            this.setScreen(new FirstScreen(this));
 	}
 }

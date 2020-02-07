@@ -48,7 +48,7 @@ public class Minion extends Image {
         //System.out.println("xS " + this.getX());
         //System.out.println("y " + this.getY());
         
-        if((y < this.getY() + 1f) && (y > this.getY() + 0.3f) && (x > this.getX() - 0.5f) && (x < this.getX() + 0.5f)){
+        if((y < this.getY() + 1f) && (y > this.getY() + 0.3f) && (x > this.getX() - 0.8f) && (x < this.getX() + 0.8f)){
             koalaTexture = dead;
             isDead = true;
             

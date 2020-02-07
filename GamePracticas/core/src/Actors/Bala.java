@@ -51,7 +51,7 @@ public class Bala extends Image {
             positionToComeX = 0;
             positionToComeY = 0;
         } else {
-             positionToComeX = this.getX() - ((this.getX() - x) / 15) ;
+            positionToComeX = this.getX() - ((this.getX() - x) / 15) + 0.07f;
             positionToComeY = this.getY() - ((this.getY() - y) / 15);
         }
        

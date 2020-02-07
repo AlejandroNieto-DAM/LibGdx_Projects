@@ -12,12 +12,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.mygdx.game.MyGdxGame;
 
-public class MainMenuScreen implements Screen {
+public class FirstScreen implements Screen {
         final MyGdxGame game;
 	OrthographicCamera camera;
         Texture bg;
 
-	public MainMenuScreen(final MyGdxGame gam) {
+	public FirstScreen(final MyGdxGame gam) {
 		game = gam;
 //                bg = new Texture(Gdx.files.internal("firstScreen.jpg"));
 		camera = new OrthographicCamera();
@@ -44,7 +44,7 @@ public class MainMenuScreen implements Screen {
             game.batch.end();
 
             if (Gdx.input.isTouched()) {
-                    game.setScreen(new MainScreen(game));
+                    game.setScreen(new Map1(game));
                     dispose();
             }
 	}

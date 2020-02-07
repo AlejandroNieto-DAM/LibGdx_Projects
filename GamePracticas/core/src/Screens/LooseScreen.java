@@ -47,7 +47,7 @@ public class LooseScreen implements Screen {
             game.batch.end();
 
             if (Gdx.input.isTouched()) {
-                    game.setScreen(new MainScreen(game));
+                    game.setScreen(new Map1(game));
                     dispose();
             }
 	}

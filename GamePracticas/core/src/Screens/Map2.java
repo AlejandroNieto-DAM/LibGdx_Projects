@@ -10,13 +10,11 @@ import Actors.Minion;
 import Actors.Planta;
 import Actors.Seta;
 import Actors.Bala;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mygdx.game.MyGdxGame;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class MainScreen implements Screen {
+public class Map2 implements Screen {
     Stage stage;
     TiledMap map;
     OrthogonalTiledMapRenderer renderer;
@@ -36,7 +34,9 @@ public class MainScreen implements Screen {
     
     Planta a;
     
-    MainScreen(MyGdxGame game){
+    TiledMapTileLayer plants;
+    
+    Map2(MyGdxGame game){
         this.game = game;
     }
 
@@ -46,6 +46,7 @@ public class MainScreen implements Screen {
         map = new TmxMapLoader().load("mapy.tmx");
         final float pixelsPerTile = 16;
         renderer = new OrthogonalTiledMapRenderer(map, 1 / pixelsPerTile);
+        
         camera = new OrthographicCamera();
 
         stage = new Stage();
@@ -58,18 +59,21 @@ public class MainScreen implements Screen {
          
         minions = new ArrayList();
         canonAmmo = new ArrayList();
-        a = new Planta();
+        
         setas = new ArrayList();
         
         mainActor.layer = (TiledMapTileLayer) map.getLayers().get("walls");
-
+        
+        
         mainActor.setPosition(10, 10);
-        a.setPosition(41.5f, 6);
+        
         
         stage.addActor(mainActor);
-        stage.addActor(a);
+        
         
         tiempo = 0.0;
+        
+        //this.loadMap(0, 0);
         this.setasPositions();
         
         for(int i = 0; i < 10; i++){
@@ -79,7 +83,7 @@ public class MainScreen implements Screen {
         
         for(int i = 0; i < 5; i++){
             canonAmmoSpawn();
-        }
+        }  
         
     }
     
@@ -93,6 +97,15 @@ public class MainScreen implements Screen {
         positionSetasX.add(109);
         positionSetasY.add(15);
     }
+    
+    public void spawnPlant(float x, float y){
+        Planta p = new Planta();
+        
+        p.setPosition(x + 0.5f, y);
+        stage.addActor(p);
+
+    }
+    
     
     public void minionSpawn(){
         Minion p = new Minion();
@@ -138,7 +151,7 @@ public class MainScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.5f, 0.5f, 1, 1);
+        //Gdx.gl.glClearColor(0.5f, 0.5f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         this.mainActorLimits();
@@ -149,6 +162,7 @@ public class MainScreen implements Screen {
         this.checkCollisions(delta);
         
         camera.update(); 
+        this.game.batch.setProjectionMatrix(camera.combined);
         
         renderer.setView(camera);
         renderer.render();
@@ -189,14 +203,7 @@ public class MainScreen implements Screen {
         this.setasCollisions();
         this.minionCollisions();
         this.canonAmmoCollisions();
-        
-        
-        
-        if(a.getX() + 0.5 > mainActor.getX() && a.getX() - 0.5 < mainActor.getX() && a.getY() + 1 > mainActor.getY()){
-            game.setScreen(new LooseScreen(game));
-            dispose();
-        }
-  
+
     }
     
     public void minionCollisions(){
@@ -209,6 +216,10 @@ public class MainScreen implements Screen {
             if(a.dead(mainActor.getX(), mainActor.getY()) == true){
                 mainActor.bump();
             }
+            
+            if(a.getY() == mainActor.getY() && a.getX() + 0.5f > mainActor.getX() && a.getX() - 0.5f < mainActor.getX()){
+
+            } 
             
             if(a.getState() == 3){
                a.setY(-10f);
@@ -252,10 +263,41 @@ public class MainScreen implements Screen {
                 canonAmmo.get(i).positionToCome(0, 0);
             }
         
-            if(mainActor.getX() - canonAmmo.get(i).getX() < 1.5 && mainActor.getY() - canonAmmo.get(i).getY() < 1.5 && canonAmmo.get(i).getX() - mainActor.getX() < 1.5 && canonAmmo.get(i).getY() - mainActor.getY() < 1.5){
-                   mainActor.stunt();
-            }   
+            if(canonAmmo.get(i).getX() + 1.5 > mainActor.getX() && canonAmmo.get(i).getX() - 1.5 < mainActor.getX() && mainActor.getY() < canonAmmo.get(i).getY() + 1.5 && canonAmmo.get(i).getY() - 1.5 > mainActor.getY()){
+                mainActor.hitState = true;
+                mainActor.stunt();
+            } else {
+                mainActor.hitState = true;
+            }
         } 
+    }
+    
+    public void loadMap(float startX, float startY) {
+        
+        TiledMapTileLayer plant = (TiledMapTileLayer)map.getLayers().get("plants");
+        
+        float endX = startX + plant.getWidth();
+        float endY = startY + plant.getHeight();
+
+        int x = (int) startX;
+        while (x < endX) {
+            int y = (int) startY;
+            while (y < endY) {
+                //System.out.println("Position x --> " + x);
+                //System.out.println("Position y --> " + y);
+                if (plant.getCell(x, y) != null ) {
+                    if(plant.getProperties().get("plants", Boolean.class) == false){
+                      plant.setCell(x, y, null);
+                      spawnPlant(x, y);  
+                    }      
+                }
+                y = y + 1;
+            }
+            x = x + 1;
+        }
+        
+        
+
     }
 
     @Override
