@@ -220,25 +220,31 @@ public class MainActor extends Image {
     }
 
     private boolean canMoveTo(float startX, float startY, boolean shouldDestroy) {
-        float endX = startX + this.getWidth();
-        float endY = startY + this.getHeight();
+        
+        if(this.layer != null){
+            float endX = startX + this.getWidth();
+            float endY = startY + this.getHeight();
 
-        int x = (int) startX;
-        while (x < endX) {
+            int x = (int) startX;
+            while (x < endX) {
 
-            int y = (int) startY;
-            while (y < endY) {
-                if (layer.getCell(x, y) != null ) {
-                    if (shouldDestroy) {
-                        layer.setCell(x, y, null);
+                int y = (int) startY;
+                while (y < endY) {
+                    if (layer.getCell(x, y) != null ) {
+                        if (shouldDestroy) {
+                            layer.setCell(x, y, null);
+                        }
+                        return false;
                     }
-                    return false;
+                    y = y + 1;
                 }
-                y = y + 1;
+                x = x + 1;
             }
-            x = x + 1;
-        }
 
-        return true;
+            return true;
+        } else {
+            return false;
+        }
+        
     }
 }

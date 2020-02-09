@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
-public class Bala extends Image {
+public class FlyTortoise extends Image {
     TextureRegion stand, jump;
     Animation walk;
 
@@ -29,7 +29,7 @@ public class Bala extends Image {
     final float MAX_VELOCITY = 5f;
     final float DAMPING = 0.87f;
 
-    public Bala() {
+    public FlyTortoise() {
         cambioDireccion = false;
         final float width = 16;
         final float height = 32;
@@ -39,28 +39,29 @@ public class Bala extends Image {
         Texture e = new Texture("nes.png");
         TextureRegion[][] e1 = TextureRegion.split(e, 16, 32);
         
-        koalaTexture = e1[0][35];
+        //koalaTexture = e1[0][26];
+        
+        walk =  new Animation(1f, e1[0][26], e1[0][27]);
+        walk.setPlayMode(Animation.PlayMode.LOOP);
         
     
     }
     
-    public boolean dead(float x, float y){
-        
-        boolean isDead = false;
-        
-        //System.out.println("xS " + this.getX());
-        //System.out.println("y " + this.getY());
-        
-        if((y < this.getY() + 1f) && (y > this.getY() + 0.3f) && (x > this.getX() - 0.8f) && (x < this.getX() + 0.8f)){ 
-            isDead = true;
+    public void positionToCome(float x, float y){
+       
+           
+        if(x == 0 && y == 0){
+            positionToComeX = 0;
+            positionToComeY = 0;
+        } else {
+            positionToComeX = this.getX() - ((this.getX() - x) / 15) + 0.07f;
+            positionToComeY = this.getY() - ((this.getY() - y) / 15);
         }
-        
-        return isDead;
-        
-        
-        
+       
+       
+       
+
     }
-    
 
     public void act(float delta) {
         time = time + delta;
@@ -69,9 +70,15 @@ public class Bala extends Image {
         float x;
         float y;  
 
-        x = this.getX();
-        y = this.getY();
-        
+        //yVelocity = yVelocity + GRAVITY;
+
+        if(positionToComeX != 0){
+           x = positionToComeX;
+           y = positionToComeY;  
+        } else {
+           x = this.getX();
+           y = this.getY();
+        } 
         
         float xChange = xVelocity * delta;
         float yChange = yVelocity * delta;
@@ -88,11 +95,13 @@ public class Bala extends Image {
 
     public void draw(Batch batch, float parentAlpha) {
         
+        TextureRegion frame = null;
+        frame = (TextureRegion) walk.getKeyFrame(time);
         
         if (isFacingRight) {
-            batch.draw(koalaTexture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            batch.draw(frame, this.getX(), this.getY(), this.getWidth(), this.getHeight());
         } else {
-            batch.draw(koalaTexture, this.getX() + this.getWidth(), this.getY(), -1 * this.getWidth(), this.getHeight());
+            batch.draw(frame, this.getX() + this.getWidth(), this.getY(), -1 * this.getWidth(), this.getHeight());
         } 
         
         

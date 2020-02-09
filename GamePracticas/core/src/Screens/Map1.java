@@ -10,6 +10,8 @@ import Actors.Minion;
 import Actors.Planta;
 import Actors.Seta;
 import Actors.Bala;
+import Actors.FlyTortoise;
+import Actors.Tortoise;
 import com.mygdx.game.MyGdxGame;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,7 +19,7 @@ import java.util.Iterator;
 public class Map1 implements Screen {
     
     public final int minionEnemys = 10;
-    public final int cannonAmmoEnemys = 5;
+    public final int numberFlyingTortoises = 1;
     
     Stage stage;
     TiledMap map;
@@ -30,6 +32,8 @@ public class Map1 implements Screen {
     MainActor mainActor;
     
     ArrayList<Bala> cannonAmmo;
+    ArrayList<FlyTortoise> flyingTortoises;
+    
     ArrayList<Minion> minions;
     ArrayList<Seta> setas;
     ArrayList<Planta> plantas;
@@ -41,13 +45,15 @@ public class Map1 implements Screen {
     
     Boolean hit;
     
+    ArrayList<Tortoise> tortoises;
+    
     Map1(MyGdxGame game){
         this.game = game;
     }
 
     @Override
     public void show() {
-        map = new TmxMapLoader().load("mapy.tmx");
+        map = new TmxMapLoader().load("Map2/map2.tmx");
         final float pixelsPerTile = 16;
         renderer = new OrthogonalTiledMapRenderer(map, 1 / pixelsPerTile);
         
@@ -58,7 +64,7 @@ public class Map1 implements Screen {
   
         mainActor = new MainActor();
         mainActor.layer = (TiledMapTileLayer) map.getLayers().get("walls");
-        mainActor.setPosition(10, 10); 
+        mainActor.setPosition(5, 5); 
         stage.addActor(mainActor);
         
         
@@ -66,7 +72,8 @@ public class Map1 implements Screen {
         cannonAmmo = new ArrayList();
         plantas = new ArrayList();
         setas = new ArrayList();
-        
+        tortoises = new ArrayList();
+        flyingTortoises = new ArrayList();
         
         positionSetasX = new ArrayList();
         positionSetasY = new ArrayList();
@@ -75,7 +82,13 @@ public class Map1 implements Screen {
         tiempoCheckCollisions = 0.0;
         hit = false;
         
-        this.loadMap(0, 0);
+        
+       
+        this.loadMapPlants(0, 0);
+        this.loadMapTortoises(0, 0);
+        
+        this.loadMapYeyp(0, 0);
+        
         this.setasPositions();
         
         for(int i = 0; i < minionEnemys; i++){
@@ -83,21 +96,33 @@ public class Map1 implements Screen {
         }
         
         
-        for(int i = 0; i < cannonAmmoEnemys; i++){
-            canonAmmoSpawn();
-        }  
+        for(int i = 0; i < numberFlyingTortoises; i++){
+            flyingTortoise();
+        }
         
     }
     
     public void setasPositions(){
-        positionSetasX.add(24);
-        positionSetasY.add(13);
+        positionSetasX.add(24); //POSICION EXACTA DE LA CAJA
+        positionSetasY.add(13); //CONTANDO DESDE ABAJO
         
         positionSetasX.add(57);
         positionSetasY.add(13);
         
         positionSetasX.add(109);
         positionSetasY.add(15);
+    }
+    
+    public void spawnTortoise(float x, float y){
+        Tortoise tortoise = new Tortoise();
+        
+        tortoise.layer = (TiledMapTileLayer) map.getLayers().get("walls");
+
+        tortoise.setPosition(x, y);
+        stage.addActor(tortoise);
+        
+        tortoises.add(tortoise);
+
     }
     
     public void spawnPlant(float x, float y){
@@ -136,17 +161,25 @@ public class Map1 implements Screen {
         setas.add(seta);
     }
     
-    public void canonAmmoSpawn(){
-        Bala cannonAmmo = new Bala();
-        
-        cannonAmmo.layer = (TiledMapTileLayer) map.getLayers().get("walls");
+    public void flyingTortoise(){
+        FlyTortoise flyingTortoise = new FlyTortoise();
+
         
         double pos = Math.random()*219 + 100;
         int pos2 = (int) pos;
         double pos3 = Math.random()*4 + 8;
         int pos24 = (int) pos3;
         
-        cannonAmmo.setPosition(pos2, pos24);
+        flyingTortoise.setPosition(pos2, pos24);
+        stage.addActor(flyingTortoise);
+        
+        this.flyingTortoises.add(flyingTortoise);
+    }
+    
+    public void cannonAmmoSpawn(float x, float y){
+        Bala cannonAmmo = new Bala();
+        
+        cannonAmmo.setPosition(x - 1, y);
         stage.addActor(cannonAmmo);
         
         this.cannonAmmo.add(cannonAmmo);
@@ -159,8 +192,15 @@ public class Map1 implements Screen {
         
         this.mainActorLimits();
         
-        //System.out.println("Koala y " + koala.getY());
-        //System.out.println("Koala x " + koala.getX());
+        tiempo += delta;
+        if(tiempo > 6){
+            System.out.println("ENTRAOOOO");
+            this.loadMapYeyp(0, 0);
+            tiempo = 0.0;
+        }
+        
+        System.out.println("Koala y " + mainActor.getY());
+        System.out.println("Koala x " + mainActor.getX());
 
         if(hit){
             tiempoCheckCollisions += delta;
@@ -208,13 +248,81 @@ public class Map1 implements Screen {
     }
     
     public void checkCollisions(float delta){
-        tiempo += delta;
-        
+  
         this.setasCollisions();
         this.minionCollisions();
-        this.canonAmmoCollisions();
+        this.flyingTortoisesCollisions();
         this.plantsCollisions();
+        this.tortoiseCollisions();
+        this.cannonAmmoCollisions();
+  
 
+    }
+    
+    
+    public void cannonAmmoCollisions(){
+        Iterator<Bala> iter = cannonAmmo.iterator();
+        while(iter.hasNext()){
+            Bala a = iter.next();
+            
+            if(a.dead(mainActor.getX(), mainActor.getY()) == true){
+                mainActor.bump();
+                hit = true;    
+                    
+                a.setY(-10f);
+                iter.remove();
+                cannonAmmo.remove(a);
+                
+            } else {
+                
+                if(a.getY() - 0.5 < mainActor.getY() && mainActor.getY() < a.getY() + 1 && a.getX() + 1f > mainActor.getX() && a.getX() - 1f < mainActor.getX() && hit == false){
+
+                    if(mainActor.getState() == 1){
+                            game.setScreen(new LooseScreen(game));
+                            dispose();
+                    }
+
+                    if(mainActor.getState() == 2){
+                        mainActor.chico();
+                    }     
+                    
+                }
+   
+            }
+        }
+    }
+    
+    public void tortoiseCollisions(){
+        Iterator<Tortoise> iter = tortoises.iterator();
+        
+        while(iter.hasNext()){
+            Tortoise a = iter.next();
+                        
+            if(a.dead(mainActor.getX(), mainActor.getY()) == true){
+                    mainActor.bump();
+                    hit = true;      
+            } else {
+                
+                if(a.getY() - 0.5 < mainActor.getY() && mainActor.getY() < a.getY() + 1 && a.getX() + 1f > mainActor.getX() && a.getX() - 1f < mainActor.getX() && hit == false){
+
+                    if(mainActor.getState() == 1){
+                            game.setScreen(new LooseScreen(game));
+                            dispose();
+                    }
+
+                    if(mainActor.getState() == 2){
+                        mainActor.chico();
+                    }     
+                    
+                }
+                
+                if(a.getState() == 4){
+                        a.setY(-10f);
+                        iter.remove();
+                        tortoises.remove(a);
+                }
+            }   
+        }
     }
     
     public void plantsCollisions(){
@@ -292,21 +400,20 @@ public class Map1 implements Screen {
         }
     }
     
-    public void canonAmmoCollisions(){
-        for(int i = 0; i < cannonAmmo.size(); i++){
+    public void flyingTortoisesCollisions(){
+        for(int i = 0; i < flyingTortoises.size(); i++){
             
-            if(mainActor.getX() - cannonAmmo.get(i).getX() < 3 && mainActor.getY() - cannonAmmo.get(i).getY() < 3 && cannonAmmo.get(i).getX() - mainActor.getX() < 3 && cannonAmmo.get(i).getY() - mainActor.getY() < 3){
-               cannonAmmo.get(i).positionToCome(mainActor.getX(), mainActor.getY());
+            if(mainActor.getX() - flyingTortoises.get(i).getX() < 3 && mainActor.getY() - flyingTortoises.get(i).getY() < 3 && flyingTortoises.get(i).getX() - mainActor.getX() < 3 && flyingTortoises.get(i).getY() - mainActor.getY() < 3){
+               flyingTortoises.get(i).positionToCome(mainActor.getX(), mainActor.getY());
             }else{
-                cannonAmmo.get(i).positionToCome(0, 0);
+                flyingTortoises.get(i).positionToCome(0, 0);
             }
         
-            if(cannonAmmo.get(i).getX() + 2 > mainActor.getX() && cannonAmmo.get(i).getX() - 1.5 < mainActor.getX() && mainActor.getY() < cannonAmmo.get(i).getY() + 1.5 && cannonAmmo.get(i).getY() - 2 > mainActor.getY() && hit == false){
-               
+            if(flyingTortoises.get(i).getX() + 0.5f > mainActor.getX() && flyingTortoises.get(i).getX() - 0.5f < mainActor.getX() && mainActor.getY() < flyingTortoises.get(i).getY() + 1f && flyingTortoises.get(i).getY() - 1 < mainActor.getY() && hit == false){
+
                 if(mainActor.getState() == 1){
                     game.setScreen(new LooseScreen(game));
                     dispose();
-                    mainActor.stunt();
                 }
                 
                 if(mainActor.getState() == 2){
@@ -320,7 +427,7 @@ public class Map1 implements Screen {
         } 
     }
     
-    public void loadMap(float startX, float startY) {
+    public void loadMapPlants(float startX, float startY) {
         
         TiledMapTileLayer plant = (TiledMapTileLayer)map.getLayers().get("plants");
         
@@ -344,6 +451,56 @@ public class Map1 implements Screen {
             x = x + 1;
         }
     }
+    
+    public void loadMapTortoises(float startX, float startY) {
+        
+        TiledMapTileLayer plant = (TiledMapTileLayer)map.getLayers().get("tortoises");
+        
+        float endX = startX + plant.getWidth();
+        float endY = startY + plant.getHeight();
+
+        int x = (int) startX;
+        while (x < endX) {
+            int y = (int) startY;
+            while (y < endY) {
+                //System.out.println("Position x --> " + x);
+                //System.out.println("Position y --> " + y);
+                if (plant.getCell(x, y) != null ) {
+                    if(plant.getProperties().get("tortoises", Boolean.class) == false){
+                      plant.setCell(x, y, null);
+                      spawnTortoise(x, y);  
+                    }      
+                }
+                y = y + 1;
+            }
+            x = x + 1;
+        }
+    }
+    
+    public void loadMapYeyp(float startX, float startY) {
+        
+        TiledMapTileLayer canons = (TiledMapTileLayer)map.getLayers().get("canon");
+        
+        float endX = startX + canons.getWidth();
+        float endY = startY + canons.getHeight();
+
+        int x = (int) startX;
+        while (x < endX) {
+            int y = (int) startY;
+            while (y < endY) {
+                //System.out.println("Position x --> " + x);
+                //System.out.println("Position y --> " + y);
+                if (canons.getCell(x, y) != null ) {
+                    if(canons.getProperties().get("canon", Boolean.class) == false){
+                      this.cannonAmmoSpawn(x, y);  
+                    }      
+                }
+                y = y + 1;
+            }
+            x = x + 1;
+        }
+    }
+    
 
     @Override
     public void dispose() {
