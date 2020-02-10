@@ -17,11 +17,15 @@ public class FireBall extends Image {
     public TiledMapTileLayer layer;
     TextureRegion koalaTexture;
     TextureRegion dead;
+    
+    int rebote = 0;
 
     Boolean cambioDireccion;
     
-    final float GRAVITY = -2.5f;
-    final float MAX_VELOCITY = 10f;
+    private Boolean booleanRight = false;
+    
+    final float GRAVITY = -3.5f;
+    final float MAX_VELOCITY = 12f;
     final float DAMPING = 0.87f;
 
     public FireBall() {
@@ -35,6 +39,10 @@ public class FireBall extends Image {
         
         koalaTexture = e1[2][28];    
     
+    }
+    
+    public int getRebotes(){
+        return rebote;
     }
     
     public void bump(){
@@ -54,13 +62,33 @@ public class FireBall extends Image {
         return isDead;
         
     }
+    
+    public void facingRight(boolean right){
+        if(right == true){
+            booleanRight = false;
+        } else {
+            booleanRight = true;
+        }
+    }
 
     public void act(float delta) {
         time = time + delta;
         
-        float velocidad1 = 1 * MAX_VELOCITY; 
-        float velocidad2 = -1 * MAX_VELOCITY; 
+        if(this.getY() < 3.2){
+            this.bump();
+            rebote++;
+        }
         
+         float velocidad1 = 0;
+         float velocidad2 = 0;
+         
+        if(booleanRight){
+            velocidad1 = 1  * MAX_VELOCITY; 
+            velocidad2 = -1  * MAX_VELOCITY; 
+        } else {
+            velocidad1 = -1  * MAX_VELOCITY; 
+            velocidad2 = 1  * MAX_VELOCITY; 
+        }
         
         yVelocity = yVelocity + GRAVITY;
 
@@ -70,16 +98,16 @@ public class FireBall extends Image {
         float yChange = yVelocity * delta;
 
         
-        if(this.getY() < 3.5){
-            this.bump();
-        }
+        
         
         if (canMoveTo(x + xChange, y, false) == false) {
-            if(cambioDireccion){
+            if(cambioDireccion ){
                 cambioDireccion = false;
+                
             } else {
                 cambioDireccion = true;
-            }
+            } 
+            
         }
         
         if(cambioDireccion){
@@ -123,7 +151,7 @@ public class FireBall extends Image {
             while (y < endY) {
                 if (layer.getCell(x, y) != null) {
                     if (shouldDestroy) {
-                        layer.setCell(x, y, null);
+                        //layer.setCell(x, y, null);
                     }
                     return false;
                 }

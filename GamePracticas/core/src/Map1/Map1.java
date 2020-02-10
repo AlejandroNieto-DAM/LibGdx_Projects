@@ -1,4 +1,4 @@
-package Screens;
+package Map1;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
@@ -13,6 +13,7 @@ import Actors.Bala;
 import Actors.FireBall;
 import Actors.FlyTortoise;
 import Actors.Tortoise;
+import Screens.LooseScreen;
 import com.mygdx.game.MyGdxGame;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -53,13 +54,13 @@ public class Map1 implements Screen {
     
     
     
-    Map1(MyGdxGame game){
+    public Map1(MyGdxGame game){
         this.game = game;
     }
 
     @Override
     public void show() {
-        map = new TmxMapLoader().load("Map2/map2.tmx");
+        map = new TmxMapLoader().load("Map3/Pelea.tmx");
         final float pixelsPerTile = 16;
         renderer = new OrthogonalTiledMapRenderer(map, 1 / pixelsPerTile);
         
@@ -93,10 +94,10 @@ public class Map1 implements Screen {
         
         
        
-        this.loadMapPlants(0, 0);
-        this.loadMapTortoises(0, 0);
+        //this.loadMapPlants(0, 0);
+        //this.loadMapTortoises(0, 0);
         
-        this.loadMapCannonAmmo(0, 0);
+        //this.loadMapCannonAmmo(0, 0);
         
         this.setasPositions();
         
@@ -204,7 +205,7 @@ public class Map1 implements Screen {
         tiempo += delta;
         if(tiempo > 4){
             System.out.println("ENTRAOOOO");
-            this.loadMapCannonAmmo(0, 0);
+            //this.loadMapCannonAmmo(0, 0);
             tiempo = 0.0;
         }
         

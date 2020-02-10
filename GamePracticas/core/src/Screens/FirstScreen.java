@@ -5,6 +5,7 @@
  */
 package Screens;
 
+import FinalMap.Final;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -44,12 +45,10 @@ public class FirstScreen implements Screen {
             game.batch.end();
 
             if (Gdx.input.isTouched()) {
-                    game.setScreen(new Map1(game));
+                    game.setScreen(new Final(game));
                     dispose();
             }
 	}
-        
-         
 
 	@Override
 	public void resize(int width, int height) {
