@@ -41,7 +41,7 @@ public class Seta extends Image {
         
         boolean isDead = false;
 
-        if((y < this.getY() + 1f) && (y > this.getY() + 0.5f) && (x > this.getX() - 0.5f) && (x < this.getX() + 0.5f)){
+        if((y < this.getY() + 1f) && (y > this.getY() - 0.5f) && (x > this.getX() - 0.5f) && (x < this.getX() + 0.5f)){
             isDead = true;
         }
         

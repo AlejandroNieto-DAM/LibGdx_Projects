@@ -23,7 +23,7 @@ public class MainActor extends Image {
 
     final float GRAVITY = -2.5f;
     final float MAX_VELOCITY = 10f;
-    final float DAMPING = 0.87f;
+    final float DAMPING = 0.57f;
     
     public int GRANDE = 2;
     public int NORMAL = 1;

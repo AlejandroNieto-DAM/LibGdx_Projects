@@ -6,6 +6,11 @@ import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public class FlyTortoise extends Image {
+    
+    private final int NORMAL = 1;
+    private final int HITTED = 2;
+    private final int DEAD = 3;
+    
     TextureRegion stand, jump;
     Animation walk;
 
@@ -28,6 +33,9 @@ public class FlyTortoise extends Image {
     final float GRAVITY = -2.5f;
     final float MAX_VELOCITY = 5f;
     final float DAMPING = 0.87f;
+    
+    
+    public int state = NORMAL;
 
     public FlyTortoise() {
         cambioDireccion = false;
@@ -41,11 +49,36 @@ public class FlyTortoise extends Image {
         
         //koalaTexture = e1[0][26];
         
-        walk =  new Animation(1f, e1[0][26], e1[0][27]);
-        walk.setPlayMode(Animation.PlayMode.LOOP);
+        jump = e1[0][26];
+        stand = e1[0][27];
         
     
     }
+    public boolean dead(float x, float y){
+        
+        boolean isDead = false;
+        
+        
+        
+        if((y < this.getY() + 1f) && (y > this.getY() + 0.5f) && (x > this.getX() - 1f) && (x < this.getX() + 1f)){
+            
+            if(state == NORMAL){
+               koalaTexture = stand; 
+            }
+             
+            if(state != DEAD){
+               state++; 
+            }
+            
+            isDead = true;
+        }
+        
+        return isDead;
+        
+        
+        
+    }
+    
     
     public void positionToCome(float x, float y){
        
@@ -57,10 +90,10 @@ public class FlyTortoise extends Image {
             positionToComeX = this.getX() - ((this.getX() - x) / 15) + 0.07f;
             positionToComeY = this.getY() - ((this.getY() - y) / 15);
         }
-       
-       
-       
-
+    }
+    
+    public int getState(){
+        return state;
     }
 
     public void act(float delta) {
@@ -96,7 +129,12 @@ public class FlyTortoise extends Image {
     public void draw(Batch batch, float parentAlpha) {
         
         TextureRegion frame = null;
-        frame = (TextureRegion) walk.getKeyFrame(time);
+        
+        if(state == NORMAL){   
+            frame = jump;     
+        } else if(state == HITTED || state == DEAD){   
+            frame = stand;  
+        }
         
         if (isFacingRight) {
             batch.draw(frame, this.getX(), this.getY(), this.getWidth(), this.getHeight());
