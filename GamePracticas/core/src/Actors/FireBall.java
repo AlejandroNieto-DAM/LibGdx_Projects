@@ -6,18 +6,14 @@ import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public class FireBall extends Image {
-    TextureRegion stand, jump;
-    Animation walk;
 
     float time = 0;
     float xVelocity = 0;
     float yVelocity = 0;
-    boolean canJump = false;
-    boolean isFacingRight = true;
     public TiledMapTileLayer layer;
-    TextureRegion koalaTexture;
-    TextureRegion dead;
     
+    TextureRegion fireBallTexture;
+
     int rebote = 0;
 
     Boolean cambioDireccion;
@@ -37,7 +33,7 @@ public class FireBall extends Image {
         Texture e = new Texture("nes.png");
         TextureRegion[][] e1 = TextureRegion.split(e, 16, 32);
         
-        koalaTexture = e1[2][28];    
+        fireBallTexture = e1[2][28];    
     
     }
     
@@ -51,15 +47,15 @@ public class FireBall extends Image {
         yVelocity = yVelocity + GRAVITY;
     }
     
-    public boolean dead(float x, float y){
+    public boolean hit(float x, float y){
         
-        boolean isDead = false;
+        boolean isHitted = false;
 
         if((y < this.getY() + 1f) && (y > this.getY() + 0.5f) && (x > this.getX() - 0.5f) && (x < this.getX() + 0.5f)){
-            isDead = true;
+            isHitted = true;
         }
         
-        return isDead;
+        return isHitted;
         
     }
     
@@ -96,10 +92,7 @@ public class FireBall extends Image {
         float y = this.getY();
         float xChange = xVelocity * delta;
         float yChange = yVelocity * delta;
-
-        
-        
-        
+  
         if (canMoveTo(x + xChange, y, false) == false) {
             if(cambioDireccion ){
                 cambioDireccion = false;
@@ -116,28 +109,17 @@ public class FireBall extends Image {
             xVelocity = velocidad2;
         }
         
-        
-
         if (canMoveTo(x, y + yChange, yVelocity > 0) == false) {
-            canJump = yVelocity < 0;
+            
             yVelocity = yChange = 0;
         }
 
         this.setPosition(x + xChange, y + yChange);
 
-        xVelocity = xVelocity * DAMPING;
-        if (Math.abs(xVelocity) < 0.5f) {
-            xVelocity = 0;
-        }
     }
 
-    public void draw(Batch batch, float parentAlpha) {
-        
-        if (isFacingRight) {
-            batch.draw(koalaTexture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
-        } else {
-            batch.draw(koalaTexture, this.getX() + this.getWidth(), this.getY(), -1 * this.getWidth(), this.getHeight());
-        }
+    public void draw(Batch batch, float parentAlpha) { 
+        batch.draw(fireBallTexture, this.getX(), this.getY(), this.getWidth(), this.getHeight());   
     }
 
     private boolean canMoveTo(float startX, float startY, boolean shouldDestroy) {

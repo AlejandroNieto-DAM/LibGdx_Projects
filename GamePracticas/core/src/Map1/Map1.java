@@ -10,9 +10,10 @@ import Actors.Minion;
 import Actors.Planta;
 import Actors.Seta;
 import Actors.Bala;
-import Actors.FireBall;
+import Actors.Coin;
 import Actors.FlyTortoise;
 import Actors.Tortoise;
+import Map2.Mapa2;
 import Screens.LooseScreen;
 import com.mygdx.game.MyGdxGame;
 import java.util.ArrayList;
@@ -20,8 +21,8 @@ import java.util.Iterator;
 
 public class Map1 implements Screen {
     
-    public final int minionEnemys = 10;
-    public final int numberFlyingTortoises = 10;
+    public final int minionEnemys = 6;
+    public final int numberFlyingTortoises = 2;
     
     Stage stage;
     TiledMap map;
@@ -32,27 +33,21 @@ public class Map1 implements Screen {
     Double tiempoCheckCollisions;
     
     MainActor mainActor;
-    
     ArrayList<Bala> cannonAmmo;
     ArrayList<FlyTortoise> flyingTortoises;
-    
     ArrayList<Minion> minions;
     ArrayList<Seta> setas;
     ArrayList<Planta> plantas;
     ArrayList<Tortoise> tortoises;
+    ArrayList<Coin> coins;
     
     
     ArrayList<Integer> positionSetasX;
     ArrayList<Integer> positionSetasY;
 
-    TiledMapTileLayer plants;
-    
     Boolean hit;
-    
-    
-    FireBall prueba = new FireBall();
-    
-    
+
+    int monedas = 0;
     
     public Map1(MyGdxGame game){
         this.game = game;
@@ -60,7 +55,8 @@ public class Map1 implements Screen {
 
     @Override
     public void show() {
-        map = new TmxMapLoader().load("Map3/Pelea.tmx");
+         
+        map = new TmxMapLoader().load("mapy.tmx");
         final float pixelsPerTile = 16;
         renderer = new OrthogonalTiledMapRenderer(map, 1 / pixelsPerTile);
         
@@ -73,17 +69,14 @@ public class Map1 implements Screen {
         mainActor.layer = (TiledMapTileLayer) map.getLayers().get("walls");
         mainActor.setPosition(5, 5); 
         stage.addActor(mainActor);
-        
-        prueba.layer = (TiledMapTileLayer) map.getLayers().get("walls");
-        prueba.setPosition(10, 5); 
-        stage.addActor(prueba);
-        
+       
         minions = new ArrayList();
         cannonAmmo = new ArrayList();
         plantas = new ArrayList();
         setas = new ArrayList();
         tortoises = new ArrayList();
         flyingTortoises = new ArrayList();
+        coins = new ArrayList();
         
         positionSetasX = new ArrayList();
         positionSetasY = new ArrayList();
@@ -92,20 +85,17 @@ public class Map1 implements Screen {
         tiempoCheckCollisions = 0.0;
         hit = false;
         
-        
-       
-        //this.loadMapPlants(0, 0);
-        //this.loadMapTortoises(0, 0);
-        
-        //this.loadMapCannonAmmo(0, 0);
-        
+ 
+        this.loadMapPlants(0, 0);
+        this.loadMapTortoises(0, 0); 
+        this.loadMapCannonAmmo(0, 0);
+        this.loadCoinsMap(0, 0);  
         this.setasPositions();
         
         for(int i = 0; i < minionEnemys; i++){
             minionSpawn();
         }
-        
-        
+         
         for(int i = 0; i < numberFlyingTortoises; i++){
             flyingTortoise();
         }
@@ -113,14 +103,15 @@ public class Map1 implements Screen {
     }
     
     public void setasPositions(){
-        positionSetasX.add(37); //POSICION EXACTA DE LA CAJA
-        positionSetasY.add(9); //CONTANDO DESDE ABAJO
+        positionSetasX.add(12); //POSICION EXACTA DE LA CAJA
+        positionSetasY.add(7); //CONTANDO DESDE ABAJO
         
-       // positionSetasX.add(57);
-       // positionSetasY.add(13);
+        positionSetasX.add(104);
+        positionSetasY.add(9);
         
-        //positionSetasX.add(109);
-        //positionSetasY.add(15);
+        positionSetasX.add(158);
+        positionSetasY.add(7);
+        
     }
     
     public void spawnTortoise(float x, float y){
@@ -132,6 +123,16 @@ public class Map1 implements Screen {
         stage.addActor(tortoise);
         
         tortoises.add(tortoise);
+
+    }
+    
+    public void spawnCoin(float x, float y){
+        Coin plant = new Coin();
+        
+        plant.setPosition(x, y);
+        stage.addActor(plant);
+        
+        coins.add(plant);
 
     }
     
@@ -200,17 +201,18 @@ public class Map1 implements Screen {
         //Gdx.gl.glClearColor(0.5f, 0.5f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         
+        
+        
         this.mainActorLimits();
         
         tiempo += delta;
-        if(tiempo > 4){
-            System.out.println("ENTRAOOOO");
-            //this.loadMapCannonAmmo(0, 0);
+        if(tiempo > 6){
+            this.loadMapCannonAmmo(0, 0);
             tiempo = 0.0;
         }
         
-        System.out.println("Koala y " + mainActor.getY());
-        System.out.println("Koala x " + mainActor.getX());
+        //System.out.println("Koala y " + mainActor.getY());
+        //System.out.println("Koala x " + mainActor.getX());
 
         if(hit){
             tiempoCheckCollisions += delta;
@@ -221,14 +223,18 @@ public class Map1 implements Screen {
         }
         this.checkCollisions(delta);
         
-        camera.update(); 
-        this.game.batch.setProjectionMatrix(camera.combined);
-        
+        camera.update();  
         renderer.setView(camera);
         renderer.render();
-
+        
         stage.act(delta);
         stage.draw();
+        
+        this.game.batch.begin(); 
+        this.game.font.draw(game.batch, "MONEDAS DE NIVEL(3): " + monedas, 10, 480);
+        
+        this.game.batch.end();     
+        
     }
     
     public void mainActorLimits(){
@@ -252,7 +258,7 @@ public class Map1 implements Screen {
         
         
         if(mainActor.getX() > 233){
-            game.setScreen(new LooseScreen(game));
+            game.setScreen(new Mapa2(game));
             dispose();
         }
     }
@@ -265,8 +271,21 @@ public class Map1 implements Screen {
         this.plantsCollisions();
         this.tortoiseCollisions();
         this.cannonAmmoCollisions();
+        this.coinCollisions();
   
 
+    }
+    
+    
+    public void coinCollisions(){
+        Iterator<Coin> iter = coins.iterator();
+        while(iter.hasNext()){
+            Coin a = iter.next();
+            if(a.getY() + 1.5f > mainActor.getY() && a.getY() < mainActor.getY() && a.getX() + 0.8f > mainActor.getX() && a.getX() - 0.8f < mainActor.getX() && hit == false){
+                a.setY(-10);
+                monedas += 1;
+            } 
+        }
     }
     
     
@@ -275,9 +294,8 @@ public class Map1 implements Screen {
         while(iter.hasNext()){
             Bala a = iter.next();
             
-            if(a.dead(mainActor.getX(), mainActor.getY()) == true){
+            if(a.hit(mainActor.getX(), mainActor.getY()) == true){
                 mainActor.bump();
-                hit = true;    
                     
                 a.setY(-10f);
                 iter.remove();
@@ -294,7 +312,10 @@ public class Map1 implements Screen {
 
                     if(mainActor.getState() == 2){
                         mainActor.chico();
-                    }     
+                    } 
+                    
+                    hit = true;    
+
                     
                 }
    
@@ -308,9 +329,8 @@ public class Map1 implements Screen {
         while(iter.hasNext()){
             Tortoise a = iter.next();
                         
-            if(a.dead(mainActor.getX(), mainActor.getY()) == true){
+            if(a.hit(mainActor.getX(), mainActor.getY()) == true){
                     mainActor.bump();
-                    hit = true;      
             } else {
                 
                 if(a.getY() + 1f > mainActor.getY() && mainActor.getY() >= a.getY() && a.getX() + 1.2f > mainActor.getX() && a.getX() - 1.2f < mainActor.getX() && hit == false){
@@ -322,7 +342,10 @@ public class Map1 implements Screen {
 
                     if(mainActor.getState() == 2){
                         mainActor.chico();
-                    }     
+                    }
+                    
+                    hit = true;      
+
                     
                 }
                 
@@ -352,7 +375,6 @@ public class Map1 implements Screen {
                     mainActor.chico();
                 } 
                 
-                hit = true;
             } 
         }
     }
@@ -363,11 +385,11 @@ public class Map1 implements Screen {
         while(iter.hasNext()){
             Minion a = iter.next();
             
-            if(a.dead(mainActor.getX(), mainActor.getY()) == true){
+            if(a.hit(mainActor.getX(), mainActor.getY()) == true){
                 mainActor.bump();
             }
             
-            if(a.getY() < mainActor.getY() + 1.1 && a.getY() > mainActor.getY() + 0.3f && a.getX() > mainActor.getX() - 1f && a.getX() < mainActor.getX() + 1f && hit == false){
+            if(a.getY() < mainActor.getY() + 1.1 && a.getY() > mainActor.getY() -0.3f && a.getX() > mainActor.getX() - 1f && a.getX() < mainActor.getX() + 1f && hit == false){
                 
                 if(mainActor.getState() == 2){
                     mainActor.chico();
@@ -379,6 +401,8 @@ public class Map1 implements Screen {
                 } 
                 
                 hit = true;
+
+                
             } 
             
             if(a.getState() == 3){
@@ -392,7 +416,7 @@ public class Map1 implements Screen {
     
     public void setasCollisions(){
         for(int i = 0 ; i < positionSetasX.size(); i++){
-            if(mainActor.getX() < positionSetasX.get(i) + 0.5 && mainActor.getX() > positionSetasX.get(i) - 0.5 && mainActor.getY() > positionSetasY.get(i) - 2.5 && mainActor.getY() < positionSetasY.get(i) - 1){
+            if(mainActor.getX() < positionSetasX.get(i) + 1 && mainActor.getX() > positionSetasX.get(i) - 1 && mainActor.getY() > positionSetasY.get(i) - 2.7 && mainActor.getY() < positionSetasY.get(i) - 1){
                 setaSpawn(positionSetasX.get(i), positionSetasY.get(i));
                 positionSetasX.remove(i);
                 positionSetasY.remove(i);                
@@ -400,7 +424,7 @@ public class Map1 implements Screen {
         }
         
         for(int i = 0;  i < setas.size(); i++){            
-            if(setas.get(i).dead(mainActor.getX(), mainActor.getY()) == true){         
+            if(setas.get(i).hit(mainActor.getX(), mainActor.getY()) == true){         
                 if(mainActor.getState() == 1){ 
                     mainActor.grande();  
                     setas.get(i).remove();
@@ -419,8 +443,9 @@ public class Map1 implements Screen {
                 flyingTortoises.get(i).positionToCome(0, 0);
             }
         
-            if(flyingTortoises.get(i).dead(mainActor.getX(), mainActor.getY()) == true){
+            if(flyingTortoises.get(i).hit(mainActor.getX(), mainActor.getY()) == true){
                 
+
                 mainActor.bump();
                 
             } else {
@@ -436,8 +461,8 @@ public class Map1 implements Screen {
                         dispose();
                     }
 
- 
                     hit = true;
+
                 }
             }
             
@@ -513,6 +538,31 @@ public class Map1 implements Screen {
                 if (canons.getCell(x, y) != null ) {
                     if(canons.getProperties().get("canon", Boolean.class) == false){
                       this.cannonAmmoSpawn(x, y);  
+                    }      
+                }
+                y = y + 1;
+            }
+            x = x + 1;
+        }
+    }
+    
+    public void loadCoinsMap(float startX, float startY) {
+        
+        TiledMapTileLayer canons = (TiledMapTileLayer)map.getLayers().get("coins");
+        
+        float endX = startX + canons.getWidth();
+        float endY = startY + canons.getHeight();
+
+        int x = (int) startX;
+        while (x < endX) {
+            int y = (int) startY;
+            while (y < endY) {
+                //System.out.println("Position x --> " + x);
+                //System.out.println("Position y --> " + y);
+                if (canons.getCell(x, y) != null ) {
+                    if(canons.getProperties().get("coins", Boolean.class) == false){
+                      canons.setCell(x, y, null);
+                      this.spawnCoin(x, y);  
                     }      
                 }
                 y = y + 1;

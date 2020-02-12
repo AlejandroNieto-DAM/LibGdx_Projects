@@ -15,12 +15,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.mygdx.game.MyGdxGame;
 
 
-public class LooseScreen implements Screen {
+public class FinalEndScreen implements Screen {
         final MyGdxGame game;
 	OrthographicCamera camera;
         Texture bg;
 
-	public LooseScreen(final MyGdxGame gam) {
+	public FinalEndScreen(final MyGdxGame gam) {
 		game = gam;
 //                bg = new Texture(Gdx.files.internal("firstScreen.jpg"));
 
@@ -44,7 +44,7 @@ public class LooseScreen implements Screen {
             game.batch.begin();
             //game.batch.draw(bg, 0, 0, 800, 480);
 
-            game.font.draw(game.batch, "Welcome to SUPER KOALIO!!! ", 100, 150);
+            game.font.draw(game.batch, "Ha completado el juego!! ", 100, 150);
             game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
             game.batch.end();
 

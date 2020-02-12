@@ -6,30 +6,28 @@ import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.maps.tiled.renderers.*;
 import com.badlogic.gdx.scenes.scene2d.*;
 import Actors.MainActor;
-import Actors.MainActor1;
+import Screens.FinalEndScreen;
 import Screens.LooseScreen;
 import com.mygdx.game.MyGdxGame;
 
-public class Inicio implements Screen {
-    
-    
-    
+public class EndGame implements Screen {
+        
     Stage stage;
     TiledMap map;
     OrthogonalTiledMapRenderer renderer;
     OrthographicCamera camera;
     MyGdxGame game;
-    
-    
-    MainActor1 mainActor;
-    
-    public Inicio(MyGdxGame game){
+
+    MainActor mainActor;
+     
+    public EndGame(MyGdxGame game){
         this.game = game;
     }
 
     @Override
     public void show() {
-        map = new TmxMapLoader().load("Map3/Inicio.tmx");
+
+        map = new TmxMapLoader().load("Map3/End.tmx");
         final float pixelsPerTile = 16;
         renderer = new OrthogonalTiledMapRenderer(map, 1 / pixelsPerTile);
         
@@ -38,24 +36,21 @@ public class Inicio implements Screen {
         stage = new Stage();
         stage.getViewport().setCamera(camera); 
   
-        mainActor = new MainActor1();
+        mainActor = new MainActor();
         mainActor.layer = (TiledMapTileLayer) map.getLayers().get("walls");
-        mainActor.setPosition(4, 4); 
+        mainActor.setPosition(1, 8); 
         stage.addActor(mainActor);
-
+        
+       
     }
 
- 
     @Override
     public void render(float delta) {
         //Gdx.gl.glClearColor(0.5f, 0.5f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         
         this.mainActorLimits();
-           
-        //System.out.println("Koala y " + mainActor.getY());
-        //System.out.println("Koala x " + mainActor.getX());
-        
+  
         camera.update(); 
         this.game.batch.setProjectionMatrix(camera.combined);
         
@@ -66,30 +61,29 @@ public class Inicio implements Screen {
         stage.draw();
     }
     
+    
     public void mainActorLimits(){
-        if(mainActor.getX() > 13 && mainActor.getX() < 36){
-           camera.position.x = mainActor.getX();
-           
+        if(mainActor.getX() > 13 && mainActor.getX() < 12){
+           camera.position.x = mainActor.getX();   
         }
            
         if(mainActor.getX() < 0){
             mainActor.setPosition(0, mainActor.getY());
         }
            
-        if(mainActor.getX() > 49){
-            mainActor.setPosition(49, mainActor.getY());
+        if(mainActor.getX() > 25){
+            mainActor.setPosition(12, mainActor.getY());
+        }
+        
+        if(mainActor.getX() > 18 && mainActor.getX() < 20){
+            game.setScreen(new FinalEndScreen(game));
+            dispose();
         }
            
         if(mainActor.getY() < -20){
             game.setScreen(new LooseScreen(game));
             dispose();
         } 
-        
-        
-        if(mainActor.getX() > 42 && mainActor.getY() > 3 && mainActor.getY() < 5){
-            game.setScreen(new Final(game));
-            dispose();
-        }
     }
 
     @Override

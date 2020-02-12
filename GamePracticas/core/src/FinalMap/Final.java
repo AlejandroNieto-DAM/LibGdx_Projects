@@ -32,6 +32,8 @@ public class Final implements Screen {
     
     Bowser ej = new Bowser();
     
+    boolean accesible = false;
+    
     public Final(MyGdxGame game){
         this.game = game;
     }
@@ -51,7 +53,7 @@ public class Final implements Screen {
   
         mainActor = new MainActor();
         mainActor.layer = (TiledMapTileLayer) map.getLayers().get("walls");
-        mainActor.setPosition(3, 19); 
+        mainActor.setPosition(3, 20); 
         stage.addActor(mainActor);
         
         
@@ -128,26 +130,28 @@ public class Final implements Screen {
     }
     
     public void bowserCollisions(){
-        if(ej.dead(mainActor.getX(), mainActor.getY())){
+        ej.positionToCome(mainActor.getX(), mainActor.getY());
+        
+        if(ej.hit(mainActor.getX(), mainActor.getY())){
             mainActor.bump();
         } else {
-            
+
             if(ej.getY() + 1f > mainActor.getY() && mainActor.getY() >= ej.getY() && ej.getX() + 1.2f > mainActor.getX() && ej.getX() - 1.2f < mainActor.getX()){
 
-                    if(mainActor.getState() == 1){
-                            game.setScreen(new LooseScreen(game));
-                            dispose();
-                    }
+                if(mainActor.getState() == 1){
+                        game.setScreen(new Final(game));
+                        dispose();
+                }
 
-                    if(mainActor.getState() == 2){
-                        mainActor.chico();
-                    }     
-                    
-                }
+                if(mainActor.getState() == 2){
+                    mainActor.chico();
+                }     
+            }
                 
-                if(ej.getState() == 10){
-                        ej.setY(-10f);
-                }
+            if(ej.getState() == 10){
+                    ej.setY(-10f);
+                    accesible = true;
+            }
         }
     }
     
@@ -155,23 +159,28 @@ public class Final implements Screen {
         Iterator<FireBall> iter = fireBalls.iterator();
         while(iter.hasNext()){
             FireBall a = iter.next();
-            
-            
-            
-            if(a.dead(mainActor.getX(), mainActor.getY()) == true){
-                //mainActor.bump();      
-                //a.setY(-10f);
-                //iter.remove();
+ 
+            if(a.hit(mainActor.getX(), mainActor.getY()) == true){
+                
+                if(mainActor.getState() == 2){
+                    mainActor.chico();
+                }
+                
+                if(mainActor.getState() == 1){
+                    game.setScreen(new LooseScreen(game));
+                    dispose();
+                }       
+                  
+            } else {
+                
+                if(a.getRebotes() == 6){
+                    a.setX(80);
+                    iter.remove(); 
+                }
                 
             }
             
-            if(a.getRebotes() == 6){
-                a.setY(-15);
-                iter.remove();
-                fireBalls.remove(a);
-            }
             
-            System.out.println("mira su y --> " + a.getY());
         }
     }
     
@@ -188,6 +197,11 @@ public class Final implements Screen {
         if(mainActor.getX() > 25){
             mainActor.setPosition(12, mainActor.getY());
         }
+        
+        if(mainActor.getX() > 23 && mainActor.getX() < 25 && mainActor.getY() < 6 && accesible == true){
+            game.setScreen(new EndGame(game));
+            dispose();
+        }
            
         if(mainActor.getY() < -20){
             game.setScreen(new LooseScreen(game));
@@ -195,11 +209,6 @@ public class Final implements Screen {
         } 
 
     }
-    
- 
-
-  
-    
 
     @Override
     public void dispose() {

@@ -7,9 +7,9 @@ import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
 
-public class MainActor extends Image {
-    TextureRegion stand;
-    Animation walk, jump;
+public class MainActor1 extends Image {
+    TextureRegion stand, jump;
+    Animation walk;
     
     TextureRegion stand1, jump1;
 
@@ -30,76 +30,32 @@ public class MainActor extends Image {
     
     public int state = NORMAL;
     
+    Texture egm_stand = new Texture("Eggman_stand.png");
+    Texture egm_run = new Texture("Eggman_run.png");
+    
     public Boolean hitState = false;
     
-        Texture mainActorTexture;
+        Texture koalaTexture;
+        Texture koalaTexture2;
 
-    public MainActor() {
-        final float width = 18;
-        final float height = 26;
+    public MainActor1() {
+        final float width = 28;
+        final float height = 36;
         this.setSize(1, height / width);
 
-        mainActorTexture = new Texture("sonicSprites.png");
-        
-        stand  = new TextureRegion(mainActorTexture,8,17,40,40);
-
-        Array<TextureRegion> frames = new Array();
-        //JUMPING
-        for(int i = 0; i < 5;i++){
-            frames.add(new TextureRegion(mainActorTexture,8+40*i,330,40,40));
-        }
-        jump = new Animation(0.1f,frames);
-        jump.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
-        
+        Array<TextureRegion> frames = new Array<TextureRegion>();
+        for(int i=0;i<3;i++)
+            frames.add(new TextureRegion(egm_run, i * 59,0, 59,55));
+        walk = new Animation(0.1f,frames);
         frames.clear();
         
-        for(int i = 0; i < 8;i++){
-            frames.add(new TextureRegion(mainActorTexture,8+44*i,66,41,40));
-        }
-        walk = new Animation(0.1f,frames);
-        walk.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
+        jump = new TextureRegion(egm_run, 0 * 59,0, 59,55);
         
-        
-        
-    }
-    
-    public void grande(){
-        
-        Texture koalaTexture = new Texture("koalio.png");
-        TextureRegion[][] grid = TextureRegion.split(koalaTexture, 18, 26);
+        stand = new TextureRegion(egm_stand, 32, 52);
 
-        stand1 = grid[0][0];
-        jump1 = grid[0][1];
-        walk = new Animation(0.15f, grid[0][2], grid[0][3], grid[0][4]);
-        walk.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
         
-       
         
-        state = GRANDE;
-    }
-    
-    
-    public void chico(){
         
-        stand  = new TextureRegion(mainActorTexture,8,17,40,40);
-
-        Array<TextureRegion> frames = new Array();
-        //JUMPING
-        for(int i = 0; i < 5;i++){
-            frames.add(new TextureRegion(mainActorTexture,8+40*i,330,40,40));
-        }
-        jump = new Animation(0.1f,frames);
-        jump.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
-        
-        frames.clear();
-        
-        for(int i = 0; i < 8;i++){
-            frames.add(new TextureRegion(mainActorTexture,8+44*i,66,41,40));
-        }
-        walk = new Animation(0.1f,frames);
-        walk.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
-        
-        state = NORMAL;
     }
     
     public int getState(){
@@ -126,28 +82,36 @@ public class MainActor extends Image {
 
     public void act(float delta) {
         time = time + delta;
-
-        boolean upTouched = Gdx.input.isTouched() && Gdx.input.getY() < Gdx.graphics.getHeight() / 2;
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) || upTouched) {
-            if (canJump) {
-                yVelocity = yVelocity + MAX_VELOCITY * 4;     
-            } 
-
-            canJump = false;    
-        }
-
-       boolean leftTouched = Gdx.input.isTouched() && Gdx.input.getX() < Gdx.graphics.getWidth() / 3;
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || leftTouched) {
-            xVelocity = -1 * MAX_VELOCITY;
-            isFacingRight = false;
-        }
-
-        boolean rightTouched = Gdx.input.isTouched() && Gdx.input.getX() > Gdx.graphics.getWidth() * 2 / 3;
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || rightTouched) {
-            xVelocity = MAX_VELOCITY;
-            isFacingRight = true;
-        } 
         
+        
+        
+        //System.out.println("hitState --> " + hitState);
+        
+        
+            
+            boolean upTouched = Gdx.input.isTouched() && Gdx.input.getY() < Gdx.graphics.getHeight() / 2;
+            if (Gdx.input.isKeyPressed(Input.Keys.UP) || upTouched) {
+                if (canJump) {
+                    yVelocity = yVelocity + MAX_VELOCITY * 4;     
+                } 
+
+                canJump = false;    
+            }
+        
+           boolean leftTouched = Gdx.input.isTouched() && Gdx.input.getX() < Gdx.graphics.getWidth() / 3;
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || leftTouched) {
+                xVelocity = -1 * MAX_VELOCITY;
+                isFacingRight = false;
+            }
+
+            boolean rightTouched = Gdx.input.isTouched() && Gdx.input.getX() > Gdx.graphics.getWidth() * 2 / 3;
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || rightTouched) {
+                xVelocity = MAX_VELOCITY;
+                isFacingRight = true;
+            } 
+        
+        
+
         yVelocity = yVelocity + GRAVITY;
 
         float x = this.getX();
@@ -185,23 +149,12 @@ public class MainActor extends Image {
     public void draw(Batch batch, float parentAlpha) {
         TextureRegion frame = null;
 
-        
-        if(state == NORMAL){
-            if (yVelocity != 0) {
-                frame = (TextureRegion) jump.getKeyFrame(time);
+        if (yVelocity != 0) {
+                frame = jump;
             } else if (xVelocity != 0) {
                 frame = (TextureRegion) walk.getKeyFrame(time);
             } else {
                 frame = stand;
-            }
-        } else if(state == GRANDE){
-            if (yVelocity != 0) {
-                frame = jump1;
-            } else if (xVelocity != 0) {
-                frame = (TextureRegion) walk.getKeyFrame(time);
-            } else {
-                frame = stand1;
-            }
         }
 
         if (isFacingRight) {

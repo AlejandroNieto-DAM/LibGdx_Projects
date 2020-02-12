@@ -7,35 +7,33 @@ import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public class Bowser extends Image {
-    TextureRegion stand;
-    Animation walk, jump;
+    TextureRegion jump;
+    Animation walk;
     
-    TextureRegion stand1, jump1;
-
     float time = 0;
     float xVelocity = 0;
     float yVelocity = 0;
     boolean canJump = false;
     boolean isFacingRight = true;
+    
     public TiledMapTileLayer layer;
 
     final float GRAVITY = -1.5f;
     final float MAX_VELOCITY = 10f;
     final float DAMPING = 0.57f;
     
-    public int GRANDE = 2;
-    public int NORMAL = 1;
-    
-    public int state = NORMAL;
-    
+    private int state = 0;
+     
     boolean cambioDireccion;
     
     double tiempoSalto = 0.0;
+    double tiempoComportamiento = 0.0;
+    
+    float positionToComeX = 0.0f;
+    float positionToComeY = 0.0f;
 
-    
-    public Boolean hitState = false;
-    
-        Texture koalaTexture;
+       
+    Texture bowser;
 
     public Bowser() {
         cambioDireccion = false;
@@ -47,12 +45,10 @@ public class Bowser extends Image {
         Texture koalaTexture = new Texture("koalio.png");
         TextureRegion[][] grid = TextureRegion.split(koalaTexture, 18, 26);
 
-        stand1 = grid[0][0];
-        jump1 = grid[0][1];
+        jump = grid[0][1];
         walk = new Animation(0.15f, grid[0][2], grid[0][3], grid[0][4]);
         walk.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
-        
-        
+ 
     }
     
     public int getState(){
@@ -68,11 +64,7 @@ public class Bowser extends Image {
     public boolean getFacingRight(){
         return isFacingRight;
     }
-    
-    public float getYVelocity(){
-        return yVelocity;
-    }
-    
+     
     public void setFacingRight(float x){
         if(x < this.getX()){
            isFacingRight = false;
@@ -82,75 +74,96 @@ public class Bowser extends Image {
         }
     }
     
-    public boolean dead(float x, float y){
+     
+    public boolean hit(float x, float y){
         
-        boolean isDead = false;
-        
-        //System.out.println("xS " + this.getX());
-        //System.out.println("y " + this.getY());
-        
-        if((y < this.getY() + 1f) && (y > this.getY() + 0.5f) && (x > this.getX() - 1f) && (x < this.getX() + 1f)){
-            // System.out.println("yeyo entrao aqui en el hit");
-               state++; 
- 
-            isDead = true;
+        boolean isHitted = false;
+  
+        if((y < this.getY() + 1.5f) && (y > this.getY() + 0.5f) && (x > this.getX() - 1f) && (x < this.getX() + 1f)){
+             state++; 
+            isHitted = true;
         }
         
-        return isDead;
-        
-        
-        
+        return isHitted;
+
+    }
+
+    public void positionToCome(float x, float y){
+          
+        if(x == 0 && y == 0){
+            positionToComeX = 0;
+            positionToComeY = 0;
+        } else {
+            positionToComeX = this.getX() - ((this.getX() - x) / 15) + 0.07f;
+            positionToComeY = this.getY() - ((this.getY() - y) / 15);
+        }
     }
 
     public void act(float delta) {
         time = time + delta;
         tiempoSalto += delta;
         
-        
-        if(tiempoSalto > Math.random() * 10 + 4){
-            this.bump();
-            tiempoSalto = 0;
-        }
-        
         yVelocity = yVelocity + GRAVITY;
         
-        float velocidad1 = 1 * MAX_VELOCITY; 
-        float velocidad2 = -1 * MAX_VELOCITY; 
-        
-
-        yVelocity = yVelocity + GRAVITY;
-
         float x = this.getX();
         float y = this.getY();
         float xChange = xVelocity * delta;
         float yChange = yVelocity * delta;
 
-         
         
-        if (canMoveTo(x + xChange, y, false) == false) {
-            if(cambioDireccion){
-                cambioDireccion = false;
-            } else {
-                cambioDireccion = true;
+        if(this.tiempoComportamiento < 10){
+            
+            if(tiempoSalto > Math.random() * 10 + 4){
+                this.bump();
+                tiempoSalto = 0;
             }
-        }
-        
-        if(cambioDireccion){
-            xVelocity = velocidad1;
-        } else {
-            xVelocity = velocidad2;
-        }
+         
+            float velocidad1 = 1 * MAX_VELOCITY; 
+            float velocidad2 = -1 * MAX_VELOCITY; 
 
-        if (canMoveTo(x, y + yChange, yVelocity > 0) == false) {
-            canJump = yVelocity < 0;
-            if(!canJump){
-                if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                    if (canJump) {
-                        yVelocity = yVelocity + MAX_VELOCITY * 4;     
-                    }   
-                    canJump = false;
+            if (canMoveTo(x + xChange, y, false) == false) {
+                if(cambioDireccion){
+                    cambioDireccion = false;
+                } else {
+                    cambioDireccion = true;
                 }
             }
+
+            if(cambioDireccion){
+                xVelocity = velocidad1;
+            } else {
+                xVelocity = velocidad2;
+            }
+            
+            this.tiempoComportamiento += delta;
+            
+            
+        } else if(tiempoComportamiento >= 10 && tiempoComportamiento <= 15){
+            
+            if(positionToComeX != 0){
+                x = positionToComeX;
+                y = positionToComeY;  
+            } else {
+               x = this.getX();
+               y = this.getY();
+            }
+
+           if (canMoveTo(x + xChange, y, false) == false) {
+               xVelocity = xChange = 0;
+           }
+            
+            this.tiempoComportamiento += delta;
+
+        }
+        
+        if(this.tiempoComportamiento > 15){
+            this.tiempoComportamiento = 0;
+        }
+        
+        //System.out.println("tiempoCompt + " + tiempoComportamiento1);
+        
+        if (canMoveTo(x, y + yChange, yVelocity > 0) == false) {
+            canJump = yVelocity < 0;
             yVelocity = yChange = 0;
         }
 
@@ -169,11 +182,11 @@ public class Bowser extends Image {
 
         
         if (yVelocity != 0) {
-            frame = jump1;
+            frame = jump;
         } else if (xVelocity != 0) {
             frame = (TextureRegion) walk.getKeyFrame(time);
         } else {
-            frame = stand1;
+            frame = jump;
         }
         
 
@@ -197,7 +210,7 @@ public class Bowser extends Image {
                 while (y < endY) {
                     if (layer.getCell(x, y) != null ) {
                         if (shouldDestroy) {
-                            layer.setCell(x, y, null);
+                            //layer.setCell(x, y, null);
                         }
                         return false;
                     }

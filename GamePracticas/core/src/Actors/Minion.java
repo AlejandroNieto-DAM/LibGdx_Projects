@@ -6,8 +6,6 @@ import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public class Minion extends Image {
-    TextureRegion stand, jump;
-    Animation walk;
 
     float time = 0;
     float xVelocity = 0;
@@ -15,8 +13,8 @@ public class Minion extends Image {
     boolean canJump = false;
     boolean isFacingRight = true;
     public TiledMapTileLayer layer;
-    TextureRegion koalaTexture;
-    TextureRegion dead;
+    TextureRegion minionTexture;
+    TextureRegion minionTextureDead;
 
     Boolean cambioDireccion;
     
@@ -27,6 +25,7 @@ public class Minion extends Image {
     final float DAMPING = 0.87f;
 
     public Minion() {
+        
         cambioDireccion = false;
         final float width = 16;
         final float height = 32;
@@ -35,30 +34,25 @@ public class Minion extends Image {
         Texture e = new Texture("nes.png");
         TextureRegion[][] e1 = TextureRegion.split(e, 16, 32);
         
-        koalaTexture = e1[0][1];
-        dead = e1[0][2];
+        minionTexture = e1[0][1];
+        minionTextureDead = e1[0][2];
         
     
     }
     
-    public boolean dead(float x, float y){
+    public boolean hit(float x, float y){
         
-        boolean isDead = false;
-        
-        //System.out.println("xS " + this.getX());
-        //System.out.println("y " + this.getY());
+        boolean hitted = false;
         
         if((y < this.getY() + 1f) && (y > this.getY() + 0.3f) && (x > this.getX() - 0.8f) && (x < this.getX() + 0.8f)){
-            koalaTexture = dead;
-            isDead = true;
+            minionTexture = minionTextureDead;
+            hitted = true;
             
             state++;
         }
         
-        return isDead;
-        
-        
-        
+        return hitted;
+  
     }
     
     public int getState(){
@@ -96,8 +90,6 @@ public class Minion extends Image {
             xVelocity = velocidad2;
         }
         
-        
-
         if (canMoveTo(x, y + yChange, yVelocity > 0) == false) {
             canJump = yVelocity < 0;
             yVelocity = yChange = 0;
@@ -114,9 +106,9 @@ public class Minion extends Image {
     public void draw(Batch batch, float parentAlpha) {
         
         if (isFacingRight) {
-            batch.draw(koalaTexture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            batch.draw(minionTexture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
         } else {
-            batch.draw(koalaTexture, this.getX() + this.getWidth(), this.getY(), -1 * this.getWidth(), this.getHeight());
+            batch.draw(minionTexture, this.getX() + this.getWidth(), this.getY(), -1 * this.getWidth(), this.getHeight());
         }
     }
 

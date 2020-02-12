@@ -11,12 +11,11 @@ public class Tortoise extends Image {
     private final int HITTED = 2;
     private final int SPINNING = 3;
     private final int DEAD = 4;
-
-    
-    TextureRegion stand, jump;
     
     Animation walk;
     Animation spinning;
+    TextureRegion tortoiseTexture;
+    TextureRegion tortoiseHitTexture;
 
     float time = 0;
     float xVelocity = 0;
@@ -24,8 +23,6 @@ public class Tortoise extends Image {
     boolean canJump = false;
     boolean isFacingRight = true;
     public TiledMapTileLayer layer;
-    TextureRegion koalaTexture;
-    TextureRegion hitted;
 
     Boolean cambioDireccion;
     
@@ -46,41 +43,32 @@ public class Tortoise extends Image {
         
         walk = new Animation(0.15f, e1[0][6], e1[0][7]);
         walk.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
-        hitted = e1[0][10];
+        tortoiseHitTexture = e1[0][10];
         spinning = new Animation(0.10f, e1[0][10], e1[0][11]);
-        spinning.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
-        
-        
+        spinning.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);  
     
     }
     
-    public boolean dead(float x, float y){
+    public boolean hit(float x, float y){
         
-        boolean isDead = false;
-        
-        //System.out.println("xS " + this.getX());
-        //System.out.println("y " + this.getY());
+        boolean isHitted = false;
+
         
         if((y < this.getY() + 1f) && (y > this.getY() + 0.5f) && (x > this.getX() - 1f) && (x < this.getX() + 1f)){
-             System.out.println("yeyo entrao aqui en el hit");
             
             if(state == NORMAL){
-               koalaTexture = hitted; 
+               tortoiseTexture = tortoiseHitTexture; 
             }
-            
-             
             
             if(state != DEAD){
                state++; 
             }
             
-            isDead = true;
+            isHitted = true;
         }
         
-        return isDead;
-        
-        
-        
+        return isHitted;
+   
     }
     
     public int getState(){
@@ -150,7 +138,7 @@ public class Tortoise extends Image {
         if(state == NORMAL){   
             frame = (TextureRegion) walk.getKeyFrame(time);       
         } else if(state == HITTED){   
-            frame = hitted;  
+            frame = tortoiseHitTexture;  
         } else if(state == SPINNING || state == DEAD){
             frame = (TextureRegion) spinning.getKeyFrame(time);
         }
