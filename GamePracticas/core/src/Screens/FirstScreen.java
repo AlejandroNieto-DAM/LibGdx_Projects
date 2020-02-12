@@ -5,6 +5,7 @@
  */
 package Screens;
 
+import FinalMap.EndGame;
 import FinalMap.Final;
 import FinalMap.Inicio;
 import Map1.Map1;
@@ -23,7 +24,7 @@ public class FirstScreen implements Screen {
 
 	public FirstScreen(final MyGdxGame gam) {
 		game = gam;
-//                bg = new Texture(Gdx.files.internal("firstScreen.jpg"));
+                bg = new Texture(Gdx.files.internal("fondo3.jpg"));
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);
 	}
@@ -39,14 +40,14 @@ public class FirstScreen implements Screen {
             game.batch.setProjectionMatrix(camera.combined);
 
             game.batch.begin();
-            //game.batch.draw(bg, 0, 0, 800, 480);
+            game.batch.draw(bg, 0, 0, 800, 480);
 
-            game.font.draw(game.batch, "Welcome to SUPER KOALIO!!! ", 100, 150);
+            game.font.draw(game.batch, "Welcome to SUPER SONIC!!! ", 100, 150);
             game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
             game.batch.end();
 
             if (Gdx.input.isTouched()) {
-                    game.setScreen(new Inicio(game));
+                    game.setScreen(new Map1(game));
                     dispose();
             }
 	}

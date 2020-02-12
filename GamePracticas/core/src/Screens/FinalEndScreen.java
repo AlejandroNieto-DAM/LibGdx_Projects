@@ -22,7 +22,7 @@ public class FinalEndScreen implements Screen {
 
 	public FinalEndScreen(final MyGdxGame gam) {
 		game = gam;
-//                bg = new Texture(Gdx.files.internal("firstScreen.jpg"));
+                bg = new Texture(Gdx.files.internal("fondo1.png"));
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);
@@ -42,7 +42,7 @@ public class FinalEndScreen implements Screen {
             game.batch.setProjectionMatrix(camera.combined);
 
             game.batch.begin();
-            //game.batch.draw(bg, 0, 0, 800, 480);
+            game.batch.draw(bg, 0, 0, 800, 480);
 
             game.font.draw(game.batch, "Ha completado el juego!! ", 100, 150);
             game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
