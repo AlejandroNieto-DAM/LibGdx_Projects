@@ -21,7 +21,7 @@ public class Inicio implements Screen {
     MyGdxGame game;
     
     
-    MainActor1 mainActor;
+    MainActor mainActor;
     
     public Inicio(MyGdxGame game){
         this.game = game;
@@ -38,7 +38,7 @@ public class Inicio implements Screen {
         stage = new Stage();
         stage.getViewport().setCamera(camera); 
   
-        mainActor = new MainActor1();
+        mainActor = new MainActor();
         mainActor.layer = (TiledMapTileLayer) map.getLayers().get("walls");
         mainActor.setPosition(4, 4); 
         stage.addActor(mainActor);
