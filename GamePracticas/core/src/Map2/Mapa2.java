@@ -15,11 +15,19 @@ import Actors.Coin;
 import Actors.FlyTortoise;
 import Actors.Tortoise;
 import Screens.LooseScreen;
+import com.badlogic.gdx.audio.Sound;
 import com.mygdx.game.MyGdxGame;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Mapa2 implements Screen {
+    
+    Sound die = Gdx.audio.newSound(Gdx.files.internal("sounds/die_converted.wav"));
+    Sound hitSound = Gdx.audio.newSound(Gdx.files.internal("sounds/kick_converted.wav"));
+    Sound coinSound = Gdx.audio.newSound(Gdx.files.internal("sounds/coin_converted.wav"));
+    Sound powerUp = Gdx.audio.newSound(Gdx.files.internal("sounds/power_up_converted.wav"));
+    Sound fireBall = Gdx.audio.newSound(Gdx.files.internal("sounds/fireball_converted.wav"));
+    Sound powerDown = Gdx.audio.newSound(Gdx.files.internal("sounds/power_down_converted.wav"));
     
     public final int minionEnemys = 10;
     public final int numberFlyingTortoises = 5;
@@ -222,8 +230,9 @@ public class Mapa2 implements Screen {
                 tiempoCheckCollisions = 0.0;
                 hit = false;
             }
+        } else {
+            this.checkCollisions(delta);
         }
-        this.checkCollisions(delta);
         
         camera.update();  
         renderer.setView(camera);
@@ -286,6 +295,7 @@ public class Mapa2 implements Screen {
             if(a.getY() + 1.5f > mainActor.getY() && a.getY() < mainActor.getY() && a.getX() + 0.8f > mainActor.getX() && a.getX() - 0.8f < mainActor.getX() && hit == false){
                 a.setY(-10);
                 monedas += 1;
+                this.coinSound.play();
             } 
         }
     }
@@ -302,6 +312,7 @@ public class Mapa2 implements Screen {
                 a.setY(-10f);
                 iter.remove();
                 cannonAmmo.remove(a);
+                this.hitSound.play();
                 
             } else {
                 
@@ -317,6 +328,8 @@ public class Mapa2 implements Screen {
                     } 
                     
                     hit = true;    
+                    
+                    this.powerDown.play();
 
                     
                 }
@@ -333,6 +346,7 @@ public class Mapa2 implements Screen {
                         
             if(a.hit(mainActor.getX(), mainActor.getY()) == true){
                     mainActor.bump();
+                    this.hitSound.play();
             } else {
                 
                 if(a.getY() + 1f > mainActor.getY() && mainActor.getY() >= a.getY() && a.getX() + 1.2f > mainActor.getX() && a.getX() - 1.2f < mainActor.getX() && hit == false){
@@ -346,7 +360,8 @@ public class Mapa2 implements Screen {
                         mainActor.chico();
                     }
                     
-                    hit = true;      
+                    hit = true;    
+                    this.powerDown.play();
 
                     
                 }
@@ -377,6 +392,7 @@ public class Mapa2 implements Screen {
                     mainActor.chico();
                 } 
                 
+                this.powerDown.play();
             } 
         }
     }
@@ -389,19 +405,22 @@ public class Mapa2 implements Screen {
             
             if(a.hit(mainActor.getX(), mainActor.getY()) == true){
                 mainActor.bump();
+                this.hitSound.play();
             }
             
             if(a.getY() < mainActor.getY() + 1.1 && a.getY() > mainActor.getY() -0.3f && a.getX() > mainActor.getX() - 1f && a.getX() < mainActor.getX() + 1f && hit == false){
+                
+                if(mainActor.getState() == 1){
+                    game.setScreen(new LooseScreen(game));
+                    dispose();
+                }
                 
                 if(mainActor.getState() == 2){
                     mainActor.chico();
                 }
                 
-                if(mainActor.getState() == 1){
-                    game.setScreen(new LooseScreen(game));
-                    dispose();
-                } 
-                
+                 
+                this.powerDown.play();
                 hit = true;
 
                 
@@ -421,7 +440,8 @@ public class Mapa2 implements Screen {
             if(mainActor.getX() < positionSetasX.get(i) + 1 && mainActor.getX() > positionSetasX.get(i) - 1 && mainActor.getY() > positionSetasY.get(i) - 2.7 && mainActor.getY() < positionSetasY.get(i) - 1){
                 setaSpawn(positionSetasX.get(i), positionSetasY.get(i));
                 positionSetasX.remove(i);
-                positionSetasY.remove(i);                
+                positionSetasY.remove(i);         
+                this.fireBall.play();
             }
         }
         
@@ -431,6 +451,7 @@ public class Mapa2 implements Screen {
                     mainActor.grande();  
                     setas.get(i).remove();
                     setas.remove(i);
+                    this.powerUp.play();
                 }   
             } 
         }
@@ -446,24 +467,25 @@ public class Mapa2 implements Screen {
             }
         
             if(flyingTortoises.get(i).hit(mainActor.getX(), mainActor.getY()) == true){
-                
-
                 mainActor.bump();
+                this.hitSound.play();
                 
             } else {
                 if(flyingTortoises.get(i).getX() + 1.1f > mainActor.getX() && flyingTortoises.get(i).getX() - 1.1f < mainActor.getX() && mainActor.getY() < flyingTortoises.get(i).getY() + 1.1f && flyingTortoises.get(i).getY() - 0.6f < mainActor.getY() && hit == false){
+                    
+                    if(mainActor.getState() == 1){
+                        game.setScreen(new LooseScreen(game));
+                        dispose();
+                    }
+                    
                     
                     if(mainActor.getState() == 2){
                         mainActor.chico();
                         mainActor.stunt();
                     }
                     
-                    if(mainActor.getState() == 1){
-                        game.setScreen(new LooseScreen(game));
-                        dispose();
-                    }
-
                     hit = true;
+                    this.powerDown.play();
 
                 }
             }

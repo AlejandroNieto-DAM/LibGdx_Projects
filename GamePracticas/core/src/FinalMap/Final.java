@@ -10,11 +10,15 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import Actors.MainActor;
 import Actors.FireBall;
 import Screens.LooseScreen;
+import com.badlogic.gdx.audio.Sound;
 import com.mygdx.game.MyGdxGame;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Final implements Screen {
+    
+    Sound hitSound = Gdx.audio.newSound(Gdx.files.internal("sounds/kick_converted.wav"));
+    Sound powerDown = Gdx.audio.newSound(Gdx.files.internal("sounds/power_down_converted.wav"));
     
     public final int minionEnemys = 10;
     public final int numberFlyingTortoises = 10;
@@ -134,19 +138,24 @@ public class Final implements Screen {
         
         if(ej.hit(mainActor.getX(), mainActor.getY())){
             mainActor.bump();
+            this.hitSound.play();
         } else {
 
             if(ej.getY() + 1f > mainActor.getY() && mainActor.getY() >= ej.getY() && ej.getX() + 1.2f > mainActor.getX() && ej.getX() - 1.2f < mainActor.getX()){
 
                 if(mainActor.getState() == 1){
-                        game.setScreen(new Final(game));
+                        game.setScreen(new LooseScreen(game));
                         dispose();
                 }
 
                 if(mainActor.getState() == 2){
                     mainActor.chico();
-                }     
+                }   
+                
+                this.powerDown.play();
             }
+            
+            
                 
             if(ej.getState() == 10){
                     ej.setY(-10f);
@@ -162,15 +171,13 @@ public class Final implements Screen {
  
             if(a.hit(mainActor.getX(), mainActor.getY()) == true){
                 
-                if(mainActor.getState() == 2){
-                    mainActor.chico();
-                }
-                
                 if(mainActor.getState() == 1){
                     game.setScreen(new LooseScreen(game));
                     dispose();
-                }       
-                  
+                }
+                
+                this.powerDown.play();
+   
             } else {
                 
                 if(a.getRebotes() == 6){

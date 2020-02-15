@@ -39,7 +39,7 @@ public class Seta extends Image {
         
         boolean isHitted = false;
 
-        if((y < this.getY() + 1f) && (y > this.getY() - 0.5f) && (x > this.getX() - 0.5f) && (x < this.getX() + 0.5f)){
+        if((y < this.getY() + 1f) && (y > this.getY() - 1f) && (x > this.getX() - 0.5f) && (x < this.getX() + 0.5f)){
             isHitted = true;
         }
         

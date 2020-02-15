@@ -6,7 +6,6 @@ import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.maps.tiled.renderers.*;
 import com.badlogic.gdx.scenes.scene2d.*;
 import Actors.MainActor;
-import Actors.MainActor1;
 import Screens.LooseScreen;
 import com.mygdx.game.MyGdxGame;
 

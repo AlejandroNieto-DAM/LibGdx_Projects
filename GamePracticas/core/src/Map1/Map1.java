@@ -15,6 +15,7 @@ import Actors.FlyTortoise;
 import Actors.Tortoise;
 import Map2.Mapa2;
 import Screens.LooseScreen;
+import com.badlogic.gdx.audio.Sound;
 import com.mygdx.game.MyGdxGame;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,6 +25,13 @@ public class Map1 implements Screen {
     public final int minionEnemys = 6;
     public final int numberFlyingTortoises = 2;
     
+    Sound die = Gdx.audio.newSound(Gdx.files.internal("sounds/die_converted.wav"));
+    Sound hitSound = Gdx.audio.newSound(Gdx.files.internal("sounds/kick_converted.wav"));
+    Sound coinSound = Gdx.audio.newSound(Gdx.files.internal("sounds/coin_converted.wav"));
+    Sound powerUp = Gdx.audio.newSound(Gdx.files.internal("sounds/power_up_converted.wav"));
+    Sound fireBall = Gdx.audio.newSound(Gdx.files.internal("sounds/fireball_converted.wav"));
+    Sound powerDown = Gdx.audio.newSound(Gdx.files.internal("sounds/power_down_converted.wav"));
+
     Stage stage;
     TiledMap map;
     OrthogonalTiledMapRenderer renderer;
@@ -216,12 +224,16 @@ public class Map1 implements Screen {
 
         if(hit){
             tiempoCheckCollisions += delta;
+            System.out.println("Pero mira que timepo +++ " + tiempoCheckCollisions);
             if(tiempoCheckCollisions > 1){
                 tiempoCheckCollisions = 0.0;
                 hit = false;
             }
+        } else {
+            
+            this.checkCollisions(delta);
         }
-        this.checkCollisions(delta);
+        
         
         camera.update();  
         renderer.setView(camera);
@@ -281,9 +293,10 @@ public class Map1 implements Screen {
         Iterator<Coin> iter = coins.iterator();
         while(iter.hasNext()){
             Coin a = iter.next();
-            if(a.getY() + 1.5f > mainActor.getY() && a.getY() < mainActor.getY() && a.getX() + 0.8f > mainActor.getX() && a.getX() - 0.8f < mainActor.getX() && hit == false){
+            if(a.getY() + 1.5f > mainActor.getY() && a.getY() < mainActor.getY() && a.getX() + 0.8f > mainActor.getX() && a.getX() - 0.8f < mainActor.getX()){
                 a.setY(-10);
                 monedas += 1;
+                coinSound.play();
             } 
         }
     }
@@ -296,6 +309,7 @@ public class Map1 implements Screen {
             
             if(a.hit(mainActor.getX(), mainActor.getY()) == true){
                 mainActor.bump();
+                hitSound.play();
                     
                 a.setY(-10f);
                 iter.remove();
@@ -315,8 +329,7 @@ public class Map1 implements Screen {
                     } 
                     
                     hit = true;    
-
-                    
+                    powerDown.play();
                 }
    
             }
@@ -331,6 +344,7 @@ public class Map1 implements Screen {
                         
             if(a.hit(mainActor.getX(), mainActor.getY()) == true){
                     mainActor.bump();
+                    hitSound.play();
             } else {
                 
                 if(a.getY() + 1f > mainActor.getY() && mainActor.getY() >= a.getY() && a.getX() + 1.2f > mainActor.getX() && a.getX() - 1.2f < mainActor.getX() && hit == false){
@@ -345,6 +359,7 @@ public class Map1 implements Screen {
                     }
                     
                     hit = true;      
+                    powerDown.play();
 
                     
                 }
@@ -367,13 +382,18 @@ public class Map1 implements Screen {
             if(a.getY() + 1.5f > mainActor.getY() && a.getY() < mainActor.getY() && a.getX() + 0.8f > mainActor.getX() && a.getX() - 0.8f < mainActor.getX() && hit == false){
                 
                 if(mainActor.getState() == 1){
+                    die.play();
                     game.setScreen(new LooseScreen(game));
                     dispose();
                 }
                 
                 if(mainActor.getState() == 2){
                     mainActor.chico();
-                } 
+                }
+                
+                powerDown.play();
+
+                hit = true;
                 
             } 
         }
@@ -387,27 +407,32 @@ public class Map1 implements Screen {
             
             if(a.hit(mainActor.getX(), mainActor.getY()) == true){
                 mainActor.bump();
-            }
-            
-            if(a.getY() < mainActor.getY() + 1.1 && a.getY() > mainActor.getY() -0.3f && a.getX() > mainActor.getX() - 1f && a.getX() < mainActor.getX() + 1f && hit == false){
-                
-                if(mainActor.getState() == 2){
-                    mainActor.chico();
-                }
-                
-                if(mainActor.getState() == 1){
-                    game.setScreen(new LooseScreen(game));
-                    dispose();
-                } 
-                
-                hit = true;
+                hitSound.play();
 
-                
-            } 
+            } else {
             
-            if(a.getState() == 3){
-               a.setY(-10f);
-               iter.remove();
+                if(a.getY() < mainActor.getY() + 1.1 && a.getY() > mainActor.getY() -0.3f && a.getX() > mainActor.getX() - 1f && a.getX() < mainActor.getX() + 1f && hit == false){
+
+                    if(mainActor.getState() == 1){
+                        game.setScreen(new LooseScreen(game));
+                        dispose();
+                    } 
+                    
+                    if(mainActor.getState() == 2){
+                        mainActor.chico();
+                    }
+
+                    hit = true;
+
+                    powerDown.play();
+
+                } 
+
+                if(a.getState() == 3){
+                   a.setY(-10f);
+                   iter.remove();
+                }
+            
             }
             
         }
@@ -429,6 +454,7 @@ public class Map1 implements Screen {
                     mainActor.grande();  
                     setas.get(i).remove();
                     setas.remove(i);
+                    powerUp.play();
                 }   
             } 
         }
@@ -445,23 +471,25 @@ public class Map1 implements Screen {
         
             if(flyingTortoises.get(i).hit(mainActor.getX(), mainActor.getY()) == true){
                 
-
+                hitSound.play();
                 mainActor.bump();
                 
             } else {
                 if(flyingTortoises.get(i).getX() + 1.1f > mainActor.getX() && flyingTortoises.get(i).getX() - 1.1f < mainActor.getX() && mainActor.getY() < flyingTortoises.get(i).getY() + 1.1f && flyingTortoises.get(i).getY() - 0.6f < mainActor.getY() && hit == false){
                     
-                    if(mainActor.getState() == 2){
-                        mainActor.chico();
-                        mainActor.stunt();
-                    }
-                    
                     if(mainActor.getState() == 1){
                         game.setScreen(new LooseScreen(game));
                         dispose();
                     }
+                    
+                    if(mainActor.getState() == 2){
+                        mainActor.chico();
+                        mainActor.stunt();
+                    }
 
                     hit = true;
+                    
+                    powerDown.play();
 
                 }
             }

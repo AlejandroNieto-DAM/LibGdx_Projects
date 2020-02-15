@@ -5,11 +5,8 @@
  */
 package Screens;
 
-import FinalMap.EndGame;
-import FinalMap.Final;
 import FinalMap.Inicio;
 import Map1.Map1;
-import Map2.Mapa2;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -47,7 +44,7 @@ public class FirstScreen implements Screen {
             game.batch.end();
 
             if (Gdx.input.isTouched()) {
-                    game.setScreen(new Map1(game));
+                    game.setScreen(new Inicio(game));
                     dispose();
             }
 	}

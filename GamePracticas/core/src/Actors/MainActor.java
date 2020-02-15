@@ -1,11 +1,13 @@
 package Actors;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.Sounds;
 
 public class MainActor extends Image {
     TextureRegion stand;
@@ -29,6 +31,9 @@ public class MainActor extends Image {
     public int NORMAL = 1;
     
     public int state = NORMAL;
+    
+    Sound jumpSound = Gdx.audio.newSound(Gdx.files.internal("sounds/jump_converted.wav"));
+
     
     public Boolean hitState = false;
     
@@ -65,15 +70,21 @@ public class MainActor extends Image {
     
     public void grande(){
         
-        Texture koalaTexture = new Texture("koalio.png");
-        TextureRegion[][] grid = TextureRegion.split(koalaTexture, 18, 26);
-
-        stand1 = grid[0][0];
-        jump1 = grid[0][1];
-        walk = new Animation(0.15f, grid[0][2], grid[0][3], grid[0][4]);
-        walk.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
+        Texture egm_jump = new Texture("MarioJump.png");
+        Texture egm_run2 = new Texture("MarioRun2.png");
+        Texture egm_run1 = new Texture("MarioRun1.png");
+        Texture egm_stand = new Texture("MarioStand1.png");
         
-       
+        TextureRegion[][] grid = TextureRegion.split(egm_run2, 19, 26);
+        TextureRegion[][] grid2 = TextureRegion.split(egm_run1, 19, 27);
+        TextureRegion[][] grid3 = TextureRegion.split(egm_stand, 16, 27);
+        TextureRegion[][] grid4 = TextureRegion.split(egm_jump, 16, 26);
+
+        stand1 = grid3[0][0];
+        jump1 = grid4[0][0];
+        
+        walk = new Animation(0.15f, grid[0][0], grid2[0][0]);
+        walk.setPlayMode(Animation.PlayMode.LOOP);
         
         state = GRANDE;
     }
@@ -130,9 +141,10 @@ public class MainActor extends Image {
         boolean upTouched = Gdx.input.isTouched() && Gdx.input.getY() < Gdx.graphics.getHeight() / 2;
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || upTouched) {
             if (canJump) {
-                yVelocity = yVelocity + MAX_VELOCITY * 4;     
-            } 
-
+                yVelocity = yVelocity + MAX_VELOCITY * 4;
+                jumpSound.play(1);
+            }
+            
             canJump = false;    
         }
 
