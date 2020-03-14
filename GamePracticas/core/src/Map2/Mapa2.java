@@ -14,6 +14,7 @@ import Actors.Bala;
 import Actors.Coin;
 import Actors.FlyTortoise;
 import Actors.Tortoise;
+import FinalMap.Inicio;
 import Screens.LooseScreen;
 import com.badlogic.gdx.audio.Sound;
 import com.mygdx.game.MyGdxGame;
@@ -269,7 +270,7 @@ public class Mapa2 implements Screen {
         
         
         if(mainActor.getX() > 233){
-            game.setScreen(new LooseScreen(game));
+            game.setScreen(new Inicio(game));
             dispose();
         }
     }

@@ -7,6 +7,7 @@ package Screens;
 
 import FinalMap.Inicio;
 import Map1.Map1;
+import Map2.Mapa2;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
